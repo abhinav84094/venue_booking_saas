@@ -70,11 +70,8 @@ export function validateEnvironment() {
       "Production requires explicit subscription enforcement",
       500,
     );
-    must(
-      process.env.VENUE_RESEND_API_KEY && process.env.VENUE_EMAIL_FROM,
-      "Configure verified transactional email in production",
-      500,
-    );
+    // Google authentication does not depend on email delivery. The transactional
+    // sender validates its own configuration when a notification is requested.
     must(
       process.env.VENUE_CORS_ALLOWED_ORIGINS.split(",").every((v) =>
         v.trim().startsWith("https://"),

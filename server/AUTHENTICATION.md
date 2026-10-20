@@ -8,8 +8,14 @@ This workflow belongs only to the independent Venue application and its
 Set `VENUE_GOOGLE_CLIENT_ID` on the API and the same OAuth client ID as
 `VITE_VENUE_GOOGLE_CLIENT_ID` when building the client. Configure the authorized
 JavaScript origins in Google Cloud for the actual frontend origins. The API
-fails startup without a Google client ID. Existing transactional email
-configuration remains available; authentication sends no email or OTP.
+fails startup without a Google client ID. Authentication sends no email or OTP
+and does not require Resend configuration, including in production.
+
+Transactional email remains available when `VENUE_RESEND_API_KEY` and
+`VENUE_EMAIL_FROM` are configured. Missing email configuration does not block
+server startup; an attempted notification without configuration fails explicitly
+with status 503. Configure both variables and a verified sender before enabling
+booking, payment or subscription email notifications.
 
 ## Registration and login
 
