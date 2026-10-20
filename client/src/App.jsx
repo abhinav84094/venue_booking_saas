@@ -50,10 +50,7 @@ export default function App() {
             {[
               ["login", "login"],
               ["register", "register"],
-              ["verify-email", "verify"],
               ["forgot-password", "forgot"],
-              ["reset-password", "reset"],
-              ["google/set-password", "google"],
             ].map(([path, mode]) => (
               <Route
                 key={path}
@@ -65,6 +62,7 @@ export default function App() {
                 }
               />
             ))}
+            <Route path="/google/set-password" element={<Auth key="google" mode="google" />} />
             <Route path="/v/:slug" element={<PublicVenue />} />
             <Route element={<ProtectedRoute />}>
               <Route path="/venues" element={<Venues />} />

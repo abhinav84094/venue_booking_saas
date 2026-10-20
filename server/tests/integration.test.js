@@ -5,8 +5,6 @@ import crypto from "node:crypto";
 import { Writable } from "node:stream";
 import { getCloudinary } from "../config/cloudinary.js";
 import { MongoMemoryReplSet } from "mongodb-memory-server";
-import { Resend } from "resend";
-import { OAuth2Client } from "google-auth-library";
 import { syncEnvironmentPlans } from "../services/subscriptionPlanService.js";
 import { getRazorpay } from "../config/razorpay.js";
 import User from "../models/User.js";
@@ -25,7 +23,6 @@ import {
 } from "../models/venueModels.js";
 import { createApp, attachErrorHandlers } from "../app.js";
 import generateToken from "../utils/generateToken.js";
-import { hashPasswordResetOtp } from "../utils/otp.js";
 import {
   createEnquiry,
   transitionBooking,
@@ -40,9 +37,8 @@ import {
   processFinancialEvent,
   requireFeature,
 } from "../services/venueSubscriptionService.js";
-let repl, server, url, owner, other, admin, ownerCookie, otherCookie, adminCookie, emailCode;
+let repl, server, url, owner, other, admin, ownerCookie, otherCookie, adminCookie;
 process.env.VENUE_JWT_SECRET = "test-only-jwt-secret-at-least-32-characters";
-process.env.VENUE_OTP_HASH_SECRET = "test-only-otp-secret-at-least-32-characters";
 process.env.VENUE_CORS_ALLOWED_ORIGINS = "http://localhost:5173";
 process.env.VENUE_SUBSCRIPTION_MODE = "off";
 process.env.NODE_ENV = "test";
@@ -143,10 +139,6 @@ const enquiry = (hall, extra = {}) => ({
   ...extra,
 });
 before(async () => {
-  mock.method(Resend.prototype, "post", async (_path, entity) => {
-    emailCode = entity.html.match(/<strong>(\d{6})<\/strong>/)?.[1];
-    return { data: { id: "test-email" }, error: null };
-  });
   repl = await MongoMemoryReplSet.create({ replSet: { count: 1 } });
   await mongoose.connect(repl.getUri(), { dbName: "venue_integration_tests" });
   await User.init();
@@ -187,61 +179,12 @@ after(async () => {
   await mongoose.disconnect();
   await repl?.stop();
 });
-test("owner registration, delivered OTP verification, password hashing and HttpOnly session login", async () => {
-  const registered = await request(
-    "POST",
-    "/auth/register",
-    { name: "New Owner", email: "new@example.test", password: "StrongPassword12!" },
-    null,
-  );
-  assert.equal(registered.status, 201, JSON.stringify(registered.data));
-  assert.match(emailCode, /^\d{6}$/);
-  const stored = await User.findOne({ email: "new@example.test" });
-  assert.notEqual(stored.password, "StrongPassword12!");
-  assert.equal(stored.role, "owner");
-  assert.equal(
-    (
-      await request(
-        "POST",
-        "/auth/login",
-        { email: stored.email, password: "StrongPassword12!" },
-        null,
-      )
-    ).status,
-    403,
-  );
-  assert.equal(
-    (await request("POST", "/auth/verify-email", { email: stored.email, otp: emailCode }, null))
-      .status,
-    200,
-  );
-  const logged = await request(
-    "POST",
-    "/auth/login",
-    { email: stored.email, password: "StrongPassword12!" },
-    null,
-  );
-  assert.equal(logged.status, 200);
-  assert.match(logged.headers.get("set-cookie"), /venueAccessToken=.*HttpOnly.*SameSite=Lax/i);
-  assert.equal(logged.data.user.password, undefined);
-  assert.equal(
-    (
-      await request(
-        "POST",
-        "/auth/login",
-        { email: stored.email, password: "wrong-password" },
-        null,
-      )
-    ).status,
-    401,
-  );
-});
 test("auth rejects role injection, NoSQL operator inputs, malformed tokens and unauthorized API access", async () => {
   assert.equal(
     (
       await request(
         "POST",
-        "/auth/register",
+        "/auth/google/password-setup",
         {
           name: "Hacker",
           email: "hacker@example.test",
@@ -263,87 +206,6 @@ test("auth rejects role injection, NoSQL operator inputs, malformed tokens and u
     (await request("GET", "/venues", undefined, "venueAccessToken=invalid")).status,
     401,
   );
-});
-test("verification guesses are capped per account even when requests are concurrent", async () => {
-  const user = new User({ name: "OTP Owner", email: "otp@example.test", password: "Password123!" });
-  user.emailVerificationOtpHash = hashPasswordResetOtp("123456", user._id);
-  user.emailVerificationExpiresAt = new Date(Date.now() + 600000);
-  await user.save();
-  const attempts = await Promise.all(
-    Array.from({ length: 7 }, () =>
-      request("POST", "/auth/verify-email", { email: user.email, otp: "000000" }, null),
-    ),
-  );
-  assert.equal(attempts.filter((a) => a.status === 429).length, 2);
-  assert.equal((await User.findById(user._id)).emailVerificationAttempts, 5);
-});
-test("password reset is single-use and invalidates all earlier JWT sessions", async () => {
-  const user = await User.create({
-    name: "Reset Owner",
-    email: "reset@example.test",
-    password: "Password123!",
-    emailVerified: true,
-    passwordResetExpiresAt: new Date(Date.now() + 600000),
-  });
-  user.passwordResetOtpHash = hashPasswordResetOtp("123456", user._id);
-  await user.save();
-  const old = cookie(user);
-  const result = await request(
-    "POST",
-    "/auth/reset-password",
-    { email: user.email, otp: "123456", newPassword: "ChangedPassword123!" },
-    null,
-  );
-  assert.equal(result.status, 200);
-  assert.equal((await request("GET", "/auth/me", undefined, old)).status, 401);
-  assert.equal(
-    (
-      await request(
-        "POST",
-        "/auth/reset-password",
-        { email: user.email, otp: "123456", newPassword: "ChangedPassword123!" },
-        null,
-      )
-    ).status,
-    400,
-  );
-});
-test("Google ID tokens are verified on the server and cannot take over nonauthoritative email accounts", async () => {
-  process.env.VENUE_GOOGLE_CLIENT_ID = "test-google-client";
-  const method = mock.method(OAuth2Client.prototype, "verifyIdToken", async ({ audience }) => {
-    assert.equal(audience, "test-google-client");
-    return {
-      getPayload: () => ({
-        sub: "google-sub-test",
-        email: other.email,
-        email_verified: true,
-        name: "Google User",
-      }),
-    };
-  });
-  assert.equal(
-    (await request("POST", "/auth/google", { credential: "test-credential" }, null)).status,
-    403,
-  );
-  method.mock.restore();
-  const success = mock.method(OAuth2Client.prototype, "verifyIdToken", async () => ({
-    getPayload: () => ({
-      sub: "new-google-sub",
-      email: "new-google@gmail.com",
-      email_verified: true,
-      name: "Google Owner",
-    }),
-  }));
-  const google = await request(
-    "POST",
-    "/auth/google/complete-signup",
-    { credential: "test-credential", password: "Password123!", confirmPassword: "Password123!" },
-    null,
-  );
-  assert.equal(google.status, 200, JSON.stringify(google.data));
-  assert.equal(google.data.user.role, "owner");
-  success.mock.restore();
-  delete process.env.VENUE_GOOGLE_CLIENT_ID;
 });
 test("CSRF origin checks block unsafe requests from arbitrary or tenant-controlled origins", async () => {
   const result = await request(

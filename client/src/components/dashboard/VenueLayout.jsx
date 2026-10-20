@@ -31,7 +31,6 @@ import { useAuth } from "../../context/authContext";
 import { useResource } from "../../hooks/useResource";
 import { getVenuePublicUrl } from "../../utils/venueDomain";
 import { Loading, ErrorNotice, Button, Badge } from "../ui";
-import SubscriptionValidity from "../SubscriptionValidity";
 const navigation = [
   ["", "Overview", LayoutDashboard, "overview:read"],
   ["profile", "Venue profile", Building2, "owner"],

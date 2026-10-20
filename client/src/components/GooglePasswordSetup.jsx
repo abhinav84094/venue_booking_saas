@@ -1,202 +1,126 @@
-import { useState } from "react";
-
-import { Lock, Eye, EyeOff, LoaderCircle, AlertCircle, ShieldCheck } from "lucide-react";
-
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import api from "../services/api";
+import { Button, Field, ErrorNotice, Loading } from "./ui";
 
-export default function GooglePasswordSetup({ credential, email, onComplete }) {
+export default function GooglePasswordSetup({ onComplete }) {
+  const [setup, setSetup] = useState(null);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    if (loading) return;
-
-    setError("");
-
-    if (!credential) {
-      setError("Google session expired. Please sign in again.");
-      return;
-    }
-
-    if (password.length < 8) {
-      setError("Password must contain at least 8 characters.");
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.");
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const { data } = await api.post("/auth/google/complete-signup", {
-        credential,
-        password,
-        confirmPassword,
+  const [error, setError] = useState(null);
+  useEffect(() => {
+    let active = true;
+    api
+      .get("/auth/google/password-setup")
+      .then(({ data }) => {
+        if (active) setSetup(data);
+      })
+      .catch((failure) => {
+        if (active) setError(failure);
       });
-
-      if (!data.success || !data.user?.id) {
-        throw new Error(data.message || "Unable to complete registration.");
-      }
-
-      await onComplete(data.user);
-    } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          err.message ||
-          "Unable to complete signup. Please try again.",
+    return () => {
+      active = false;
+    };
+  }, []);
+  async function submit(event) {
+    event.preventDefault();
+    if (loading) return;
+    setError(null);
+    if (new Date(setup.expiresAt).getTime() <= Date.now()) {
+      setSetup(null);
+      setError(new Error("Google authorization expired. Please sign in with Google again."));
+      return;
+    }
+    if (setup.purpose !== "link" && new TextEncoder().encode(password).length > 72) {
+      setError(new Error("Password must fit within 72 UTF-8 bytes."));
+      return;
+    }
+    if (setup.purpose !== "link" && password !== confirmPassword) {
+      setError(new Error("Passwords do not match."));
+      return;
+    }
+    setLoading(true);
+    try {
+      const { data } = await api.post(
+        setup.purpose === "link" ? "/auth/google/link" : "/auth/google/password-setup",
+        setup.purpose === "link" ? { password } : { password, confirmPassword },
       );
+      await onComplete(data, setup.purpose);
+    } catch (failure) {
+      setError(failure);
+      if ([401, 409].includes(failure.response?.status)) setSetup(null);
     } finally {
+      setPassword("");
+      setConfirmPassword("");
       setLoading(false);
     }
-  };
-
-  const inputClass =
-    "min-h-12 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 py-3 pl-10 pr-12 text-base text-slate-900 dark:text-slate-100 outline-none transition placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:opacity-60 sm:text-sm";
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      <div className="rounded-xl border border-blue-100 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/40 p-4">
-        <div className="flex items-start gap-3">
-          <ShieldCheck
-            size={20}
-            className="mt-0.5 shrink-0 text-blue-600 dark:text-blue-300"
-            aria-hidden="true"
-          />
-
-          <div className="min-w-0">
-            <p className="text-sm font-semibold text-blue-900 dark:text-blue-300">
-              Google account verified
-            </p>
-
-            <p className="mt-1 break-all text-sm text-blue-700 dark:text-blue-300">{email}</p>
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <label
-          htmlFor="googlePassword"
-          className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200"
-        >
-          Create Password
-        </label>
-
-        <div className="relative">
-          <Lock
-            size={18}
-            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-400"
-            aria-hidden="true"
-          />
-
-          <input
-            id="googlePassword"
-            type={showPassword ? "text" : "password"}
-            value={password}
-            onChange={(event) => {
-              setPassword(event.target.value);
-              setError("");
-            }}
-            placeholder="At least 8 characters"
-            autoComplete="new-password"
-            minLength={8}
-            required
-            disabled={loading}
-            className={inputClass}
-          />
-
-          <button
-            type="button"
-            onClick={() => setShowPassword((previous) => !previous)}
-            aria-label={showPassword ? "Hide password" : "Show password"}
-            className="absolute right-1 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 hover:dark:text-slate-200"
-          >
-            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-          </button>
-        </div>
-      </div>
-
-      <div>
-        <label
-          htmlFor="googleConfirmPassword"
-          className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200"
-        >
-          Confirm Password
-        </label>
-
-        <div className="relative">
-          <Lock
-            size={18}
-            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-400"
-            aria-hidden="true"
-          />
-
-          <input
-            id="googleConfirmPassword"
-            type={showConfirmPassword ? "text" : "password"}
-            value={confirmPassword}
-            onChange={(event) => {
-              setConfirmPassword(event.target.value);
-              setError("");
-            }}
-            placeholder="Re-enter your password"
-            autoComplete="new-password"
-            minLength={8}
-            required
-            disabled={loading}
-            className={inputClass}
-          />
-
-          <button
-            type="button"
-            onClick={() => setShowConfirmPassword((previous) => !previous)}
-            aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
-            className="absolute right-1 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 hover:dark:text-slate-200"
-          >
-            {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-          </button>
-        </div>
-      </div>
-
-      {error && (
-        <div
-          role="alert"
-          className="flex items-start gap-2 rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/40 p-3 text-sm text-red-700 dark:text-red-300"
-        >
-          <AlertCircle size={18} className="mt-0.5 shrink-0" aria-hidden="true" />
-          <span className="min-w-0 break-words">{error}</span>
-        </div>
-      )}
-
-      <button
-        type="submit"
-        disabled={loading}
-        className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        {loading ? (
-          <>
-            <LoaderCircle size={18} className="animate-spin" aria-hidden="true" />
-            Creating Account...
-          </>
+  }
+  if (!setup)
+    return (
+      <>
+        <ErrorNotice error={error} />
+        {error ? (
+          <Link className="text-link" to="/login">
+            Sign in with Google again
+          </Link>
         ) : (
-          "Complete Registration"
+          <Loading text="Checking Google authorization..." />
         )}
-      </button>
-
-      <p className="text-center text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-        You can use either Google Sign-In or your password to access your account after
-        registration.
+      </>
+    );
+  const linking = setup.purpose === "link";
+  return (
+    <form onSubmit={submit} className="form-stack">
+      <p>
+        Google verified: <strong>{setup.email}</strong>
       </p>
+      <p>
+        {linking
+          ? "An account already exists. Confirm your existing application password to securely link Google. If you no longer know it, contact support for manual ownership review."
+          : setup.purpose === "recover"
+            ? "Choose a new password. You will be signed out on all devices."
+            : "Create a password to finish registration. You can then sign in with Google or your password."}
+      </p>
+      <Field
+        label={linking ? "Existing application password" : "New password"}
+        type={showPassword ? "text" : "password"}
+        required
+        minLength={linking ? 1 : 8}
+        maxLength={72}
+        autoComplete={linking ? "current-password" : "new-password"}
+        value={password}
+        onChange={(event) => setPassword(event.target.value)}
+      />
+      {!linking && (
+        <Field
+          label="Confirm password"
+          type={showPassword ? "text" : "password"}
+          autoComplete="new-password"
+          required
+          minLength={8}
+          maxLength={72}
+          value={confirmPassword}
+          onChange={(event) => setConfirmPassword(event.target.value)}
+        />
+      )}
+      <label>
+        <input
+          type="checkbox"
+          checked={showPassword}
+          onChange={(event) => setShowPassword(event.target.checked)}
+        />{" "}
+        Show password
+      </label>
+      <ErrorNotice error={error} />
+      <Button type="submit" busy={loading}>
+        {linking
+          ? "Link Google and sign in"
+          : setup.purpose === "recover"
+            ? "Reset password"
+            : "Complete registration"}
+      </Button>
     </form>
   );
 }

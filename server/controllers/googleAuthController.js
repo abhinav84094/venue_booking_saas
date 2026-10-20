@@ -1,41 +1,77 @@
 import {
   authenticateGoogleAccount,
-  registerGoogleAccount,
+  createGoogleChallenge,
+  discardAuthorization,
+  getGoogleSetup,
+  completeGooglePassword,
+  linkGoogleAccount,
+  AUTHORIZATION_LIFETIME_MS,
 } from "../services/auth/googleAccountService.js";
-import { googleSignupSchema } from "../validators/authValidator.js";
+import {
+  googleChallengeSchema,
+  googleCredentialSchema,
+  googlePasswordSchema,
+  googleLinkSchema,
+} from "../validators/authValidator.js";
 import { issueLogin } from "./authController.js";
+import { AUTH_COOKIE, cookieOptions } from "../utils/authCookie.js";
 
-export const googleLogin = async (req, res) => {
-  try {
-    const result = await authenticateGoogleAccount(req.body?.credential);
-    if (result.user) return issueLogin(res, result.user);
-    return res.json(result);
-  } catch (error) {
-    return res.status(error.statusCode || 401).json({
-      success: false,
-      message: [403, 409, 503].includes(error.statusCode)
-        ? error.message
-        : "Google authentication failed",
-    });
-  }
-};
+const CHALLENGE_COOKIE = "venueGoogleChallenge";
+const SETUP_COOKIE = "venueGoogleSetup";
+const options = () => ({ ...cookieOptions(), path: "/api/auth/google" });
+const setCookie = (res, name, token) =>
+  res.cookie(name, token, {
+    ...options(),
+    maxAge: AUTHORIZATION_LIFETIME_MS,
+  });
 
-export const completeGoogleSignup = async (req, res) => {
-  try {
-    const input = googleSignupSchema.safeParse(req.body);
-    if (!input.success)
-      return res.status(400).json({
-        success: false,
-        message: "Matching passwords of at least 8 characters are required",
-      });
-    const user = await registerGoogleAccount(input.data);
-    return issueLogin(res, user);
-  } catch (error) {
-    if (error.code === 11000)
-      return res.status(409).json({ success: false, message: "Account already exists" });
-    return res.status(error.statusCode || 400).json({
-      success: false,
-      message: error.statusCode ? error.message : "Unable to complete Google signup",
-    });
-  }
-};
+export async function googleChallenge(req, res) {
+  const { purpose } = googleChallengeSchema.parse(req.body);
+  await discardAuthorization(req.cookies?.[CHALLENGE_COOKIE]);
+  await discardAuthorization(req.cookies?.[SETUP_COOKIE]);
+  res.clearCookie(SETUP_COOKIE, options());
+  const challenge = await createGoogleChallenge(purpose);
+  setCookie(res, CHALLENGE_COOKIE, challenge.token);
+  res.json({ success: true, nonce: challenge.nonce });
+}
+
+export async function googleLogin(req, res) {
+  const { credential } = googleCredentialSchema.parse(req.body);
+  const result = await authenticateGoogleAccount(credential, req.cookies?.[CHALLENGE_COOKIE]);
+  res.clearCookie(CHALLENGE_COOKIE, options());
+  if (result.user) return issueLogin(res, result.user);
+  setCookie(res, SETUP_COOKIE, result.setupToken);
+  return res.json({
+    success: true,
+    requiresPassword: result.purpose !== "link",
+    requiresLink: result.purpose === "link",
+    purpose: result.purpose,
+    email: result.email,
+  });
+}
+
+export async function googleSetupStatus(req, res) {
+  const setup = await getGoogleSetup(req.cookies?.[SETUP_COOKIE]);
+  res.json({
+    success: true,
+    purpose: setup.purpose,
+    email: setup.email,
+    expiresAt: setup.expiresAt,
+  });
+}
+
+export async function completeGoogleSetup(req, res) {
+  const { password } = googlePasswordSchema.parse(req.body);
+  const result = await completeGooglePassword(req.cookies?.[SETUP_COOKIE], password);
+  res.clearCookie(SETUP_COOKIE, options());
+  if (result.purpose === "register") return issueLogin(res, result.user);
+  res.clearCookie(AUTH_COOKIE, cookieOptions());
+  return res.json({ success: true, message: "Password changed. Sign in again." });
+}
+
+export async function completeGoogleLink(req, res) {
+  const { password } = googleLinkSchema.parse(req.body);
+  const user = await linkGoogleAccount(req.cookies?.[SETUP_COOKIE], password);
+  res.clearCookie(SETUP_COOKIE, options());
+  return issueLogin(res, user);
+}

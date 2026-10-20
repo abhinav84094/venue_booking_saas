@@ -8,7 +8,9 @@ export default defineConfig(({ mode }) => ({
     mode === "e2e"
       ? {
           "import.meta.env.VITE_VENUE_API_URL": JSON.stringify("/api"),
-          "import.meta.env.VITE_VENUE_GOOGLE_CLIENT_ID": JSON.stringify(""),
+          "import.meta.env.VITE_VENUE_GOOGLE_CLIENT_ID": JSON.stringify(
+            "disposable-browser-google-client",
+          ),
           "import.meta.env.VITE_PUBLIC_VENUE_DOMAIN": JSON.stringify(""),
           "import.meta.env.VITE_VENUE_PLATFORM_URL": JSON.stringify(""),
         }

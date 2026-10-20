@@ -8,28 +8,21 @@ export const passwordSchema = z
     (value) => Buffer.byteLength(value, "utf8") <= 72,
     "Password must fit within 72 UTF-8 bytes",
   );
-export const registrationSchema = z
-  .object({
-    name: z.string().trim().min(2).max(100),
-    email: emailSchema,
-    password: passwordSchema,
-  })
-  .strict();
-export const emailRequestSchema = z.object({ email: emailSchema }).strict();
-export const codeSchema = z
-  .object({ email: emailSchema, otp: z.string().regex(/^\d{6}$/) })
-  .strict();
 export const loginSchema = z
   .object({ email: emailSchema, password: z.string().min(1).max(72) })
   .strict();
-export const passwordResetSchema = codeSchema.extend({ newPassword: passwordSchema }).strict();
 export const accountSchema = z.object({ name: z.string().trim().min(2).max(100) }).strict();
-
-export const googleSignupSchema = z
+export const googleChallengeSchema = z
+  .object({ purpose: z.enum(["login", "register", "recover"]) })
+  .strict();
+export const googleCredentialSchema = z
+  .object({ credential: z.string().min(1).max(10000) })
+  .strict();
+export const googlePasswordSchema = z
   .object({
-    credential: z.unknown(),
     password: passwordSchema,
-    confirmPassword: z.string(),
+    confirmPassword: z.string().max(72),
   })
   .strict()
   .refine((input) => input.password === input.confirmPassword, "Passwords must match");
+export const googleLinkSchema = z.object({ password: z.string().min(1).max(72) }).strict();

@@ -11,13 +11,15 @@ import { attachClient } from "../services/seoService.js";
 import { syncEnvironmentPlans } from "../services/subscriptionPlanService.js";
 import { getRazorpay } from "../config/razorpay.js";
 import { getCloudinary } from "../config/cloudinary.js";
+import { OAuth2Client } from "google-auth-library";
+import GoogleAuthorization from "../models/GoogleAuthorization.js";
 process.env.NODE_ENV = "test";
 process.env.VENUE_PLAN_3_MONTHS_PRICE = "500";
 process.env.VENUE_PLAN_1_YEAR_PRICE = "1500";
 process.env.VENUE_SUBSCRIPTION_MODE = "off";
 process.env.VENUE_SERVE_CLIENT = "true";
 process.env.VENUE_JWT_SECRET = "disposable-browser-test-jwt-secret-32-characters";
-process.env.VENUE_OTP_HASH_SECRET = "disposable-browser-test-otp-secret-32-characters";
+process.env.VENUE_GOOGLE_CLIENT_ID = "disposable-browser-google-client";
 process.env.VENUE_CORS_ALLOWED_ORIGINS = "http://127.0.0.1:5600";
 process.env.VENUE_SUBSCRIPTION_RAZORPAY_KEY_ID = "rzp_test_browser";
 process.env.VENUE_SUBSCRIPTION_RAZORPAY_KEY_SECRET = "disposable-browser-gateway-secret";
@@ -25,6 +27,25 @@ process.env.VENUE_CLOUDINARY_CLOUD_NAME = "disposable-browser-images";
 process.env.VENUE_CLOUDINARY_API_KEY = "disposable-browser-image-key";
 process.env.VENUE_CLOUDINARY_API_SECRET = "disposable-browser-image-secret";
 delete process.env.PUBLIC_VENUE_DOMAIN;
+// Google UI responses are simulated only in this disposable browser process.
+// authentication.test.js separately exercises the real SDK with signed tokens.
+mock.method(OAuth2Client.prototype, "verifyIdToken", async ({ idToken }) => {
+  const input = JSON.parse(idToken);
+  if (input.testOnly !== "venue-browser-fixture") throw new Error("Invalid fixture");
+  return {
+    getPayload: () => ({
+      sub: input.sub,
+      email: input.email,
+      name: "Google Browser Owner",
+      nonce: input.nonce,
+      email_verified: true,
+      iss: "https://accounts.google.com",
+      aud: process.env.VENUE_GOOGLE_CLIENT_ID,
+      iat: Math.floor(Date.now() / 1000),
+      exp: Math.floor(Date.now() / 1000) + 3600,
+    }),
+  };
+});
 // Only this disposable test process replaces the remote SDK. Production verification,
 // identity checks and transactional activation still run for every browser checkout.
 // The image SDK is also stubbed here, so browser uploads never contact a real account.
@@ -81,6 +102,7 @@ const repl = await MongoMemoryReplSet.create({
 });
 await mongoose.connect(repl.getUri(), { dbName: "venue_disposable_browser_tests" });
 await User.init();
+await GoogleAuthorization.init();
 await initializeIndexes();
 await syncEnvironmentPlans();
 await User.create({

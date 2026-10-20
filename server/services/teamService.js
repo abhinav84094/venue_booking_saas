@@ -9,7 +9,7 @@ export async function assignStaff(venue, input, actorId) {
     emailVerified: true,
     suspended: false,
   });
-  must(user, "Staff member must first register and verify an account", 404);
+  must(user, "Staff member must first complete Google registration and password setup", 404);
   must(String(user._id) !== String(venue.ownerId), "The venue owner already has access");
   const membership = await VenueMembership.findOneAndUpdate(
     { venueId: venue._id, userId: user._id },

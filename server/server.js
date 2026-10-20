@@ -4,6 +4,7 @@ import { validateEnvironment } from "./config/env.js";
 import connectDB, { assertHallMigrationComplete } from "./config/db.js";
 import { syncEnvironmentPlans } from "./services/subscriptionPlanService.js";
 import User from "./models/User.js";
+import GoogleAuthorization from "./models/GoogleAuthorization.js";
 import { initializeIndexes } from "./models/venueModels.js";
 import { createApp, attachErrorHandlers } from "./app.js";
 import { attachClient } from "./services/seoService.js";
@@ -12,6 +13,7 @@ try {
   await connectDB();
   await assertHallMigrationComplete();
   await User.init();
+  await GoogleAuthorization.init();
   await initializeIndexes();
   await syncEnvironmentPlans();
   const app = createApp();

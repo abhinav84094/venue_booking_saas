@@ -21,6 +21,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       minlength: 8,
+      select: false,
     },
 
     googleId: {
@@ -36,39 +37,11 @@ const userSchema = new mongoose.Schema(
       default: "owner",
     },
     suspended: { type: Boolean, default: false },
-    emailVerificationAttempts: { type: Number, default: 0, min: 0 },
     emailVerified: {
       type: Boolean,
       default: false,
     },
 
-    emailVerificationOtpHash: {
-      type: String,
-    },
-
-    emailVerificationExpiresAt: {
-      type: Date,
-    },
-    emailVerificationLastSentAt: {
-      type: Date,
-    },
-    passwordResetOtpHash: {
-      type: String,
-    },
-
-    passwordResetExpiresAt: {
-      type: Date,
-    },
-
-    passwordResetLastSentAt: {
-      type: Date,
-    },
-
-    passwordResetAttempts: {
-      type: Number,
-      default: 0,
-      min: 0,
-    },
     tokenVersion: {
       type: Number,
       default: 0,

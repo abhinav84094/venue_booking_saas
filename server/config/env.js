@@ -19,8 +19,8 @@ export function validateEnvironment() {
     500,
   );
   must(
-    process.env.VENUE_OTP_HASH_SECRET?.length >= 32,
-    "VENUE_OTP_HASH_SECRET must contain at least 32 characters",
+    process.env.VENUE_GOOGLE_CLIENT_ID,
+    "Configure VENUE_GOOGLE_CLIENT_ID for Google authentication",
     500,
   );
   must(process.env.VENUE_CORS_ALLOWED_ORIGINS, "Configure VENUE_CORS_ALLOWED_ORIGINS", 500);
@@ -73,11 +73,6 @@ export function validateEnvironment() {
     must(
       process.env.VENUE_RESEND_API_KEY && process.env.VENUE_EMAIL_FROM,
       "Configure verified transactional email in production",
-      500,
-    );
-    must(
-      process.env.VENUE_JWT_SECRET !== process.env.VENUE_OTP_HASH_SECRET,
-      "Use independent JWT and OTP secrets",
       500,
     );
     must(

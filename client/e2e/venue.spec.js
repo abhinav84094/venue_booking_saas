@@ -67,6 +67,11 @@ test("responsive welcome and auth pages render with no overflow or critical acce
   await page.screenshot({ path: testInfo.outputPath("landing-mobile.png"), fullPage: true });
   await page.getByRole("link", { name: "Create your venue", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Make room for more." })).toBeVisible();
+  await expect(page.getByLabel("Email address")).toHaveCount(0);
+  await expect(page.locator('input[type="password"]')).toHaveCount(0);
+  await noOverflow(page);
+  await page.getByRole("link", { name: "Sign in", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Welcome back." })).toBeVisible();
   expect(
     await page
       .locator(".field label")

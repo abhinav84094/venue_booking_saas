@@ -2,15 +2,14 @@ import { rateLimit, ipKeyGenerator } from "express-rate-limit";
 
 export const rateLimitPolicies = Object.freeze({
   googleLogin: { windowMs: 15 * 60 * 1000, limit: 10 },
-  googleSignup: { windowMs: 60 * 60 * 1000, limit: 5 },
+  googleChallenge: { windowMs: 15 * 60 * 1000, limit: 20 },
+  googleSetup: { windowMs: 15 * 60 * 1000, limit: 15 },
+  googleLink: { windowMs: 15 * 60 * 1000, limit: 5 },
   passwordLogin: { windowMs: 15 * 60 * 1000, limit: 10 },
   slugAvailability: { windowMs: 60 * 1000, limit: 30 },
   publicVenue: { windowMs: 60 * 1000, limit: 120 },
   publicServices: { windowMs: 60 * 1000, limit: 120 },
   publicAvailability: { windowMs: 60 * 1000, limit: 30 },
-  register: { windowMs: 60 * 60 * 1000, limit: 10 },
-  verification: { windowMs: 15 * 60 * 1000, limit: 15 },
-  recovery: { windowMs: 15 * 60 * 1000, limit: 10 },
   enquiry: { windowMs: 60 * 60 * 1000, limit: 15 },
   upload: { windowMs: 60 * 1000, limit: 20 },
   general: { windowMs: 60 * 1000, limit: 300 },
