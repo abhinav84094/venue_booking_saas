@@ -302,11 +302,47 @@ test("Google signature, audience, issuer, strict expiration, verified email, fre
   assert.equal(await User.countDocuments({ email: "invalid@gmail.com" }), 0);
 });
 
+test("missing Google challenge cookies report a recoverable session error without consuming authorization", async () => {
+  const account = identity("missing-challenge-cookie");
+  const start = await challenge("register");
+  const body = { credential: credential(start.nonce, account) };
+  const missing = await request("POST", "/auth/google", body);
+  assert.equal(missing.status, 401);
+  assert.equal(missing.data.code, "GOOGLE_SESSION_MISSING");
+  assert.equal(
+    missing.data.message,
+    "Your sign-in session could not be saved. Reload this page and try again.",
+  );
+  assert.equal(cookie(missing, "venueGoogleSetup"), undefined);
+  assert.equal(cookie(missing, "venueAccessToken"), undefined);
+  assert.equal(await User.countDocuments({ email: account.email }), 0);
+  assert.ok(await GoogleAuthorization.exists({ tokenHash: tokenHash(start.cookie) }));
+
+  const malformed = await request(
+    "POST",
+    "/auth/google",
+    body,
+    "venueGoogleChallenge=malformed",
+  );
+  assert.equal(malformed.status, 401);
+  assert.notEqual(malformed.data.code, "GOOGLE_SESSION_MISSING");
+  assert.match(malformed.data.message, /expired or already used/);
+
+  const verified = await request("POST", "/auth/google", body, start.cookie);
+  assert.equal(verified.status, 200);
+  assert.equal(verified.data.purpose, "register");
+  assert.ok(cookie(verified, "venueGoogleSetup"));
+  assert.equal(await User.countDocuments({ email: account.email }), 0);
+});
+
 test("Google credentials and expired challenges cannot be replayed", async () => {
   const start = await challenge("register");
   const body = { credential: credential(start.nonce, identity("replay")) };
   assert.equal((await request("POST", "/auth/google", body, start.cookie)).status, 200);
-  assert.equal((await request("POST", "/auth/google", body, start.cookie)).status, 401);
+  const replay = await request("POST", "/auth/google", body, start.cookie);
+  assert.equal(replay.status, 401);
+  assert.notEqual(replay.data.code, "GOOGLE_SESSION_MISSING");
+  assert.match(replay.data.message, /expired or already used/);
   const fresh = await challenge("register");
   assert.equal((await request("POST", "/auth/google", body, fresh.cookie)).status, 401);
   const expired = await challenge("register");
@@ -314,19 +350,17 @@ test("Google credentials and expired challenges cannot be replayed", async () =>
     { tokenHash: tokenHash(expired.cookie) },
     { $set: { expiresAt: new Date(0) } },
   );
-  assert.equal(
-    (
-      await request(
-        "POST",
-        "/auth/google",
-        {
-          credential: credential(expired.nonce, identity("expired-challenge")),
-        },
-        expired.cookie,
-      )
-    ).status,
-    401,
+  const expiredResponse = await request(
+    "POST",
+    "/auth/google",
+    {
+      credential: credential(expired.nonce, identity("expired-challenge")),
+    },
+    expired.cookie,
   );
+  assert.equal(expiredResponse.status, 401);
+  assert.notEqual(expiredResponse.data.code, "GOOGLE_SESSION_MISSING");
+  assert.match(expiredResponse.data.message, /expired or already used/);
 });
 
 test("legacy accounts require explicit Google plus password proof; recovery never auto-links", async () => {

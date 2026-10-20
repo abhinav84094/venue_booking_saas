@@ -37,6 +37,12 @@ export async function googleChallenge(req, res) {
 
 export async function googleLogin(req, res) {
   const { credential } = googleCredentialSchema.parse(req.body);
+  if (!req.cookies?.[CHALLENGE_COOKIE])
+    return res.status(401).json({
+      success: false,
+      code: "GOOGLE_SESSION_MISSING",
+      message: "Your sign-in session could not be saved. Reload this page and try again.",
+    });
   const result = await authenticateGoogleAccount(credential, req.cookies?.[CHALLENGE_COOKIE]);
   res.clearCookie(CHALLENGE_COOKIE, options());
   if (result.user) return issueLogin(res, result.user);

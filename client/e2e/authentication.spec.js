@@ -51,6 +51,15 @@ test("Google-only registration, password setup, both logins and Google-only reco
   await expect(page.locator('input[type="password"]')).toHaveCount(0);
   const registrationAxe = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
   expect(registrationAxe.violations.map((v) => v.id)).toEqual([]);
+  await expect(
+    page.getByRole("button", { name: "Continue with Google", exact: true }),
+  ).toBeVisible();
+  const challenge = (await page.context().cookies()).find(
+    (cookie) => cookie.name === "venueGoogleChallenge",
+  );
+  expect(challenge.httpOnly).toBe(true);
+  expect(challenge.sameSite).toBe("Lax");
+  expect(challenge.path).toBe("/api/auth/google");
   await page.getByRole("button", { name: "Continue with Google", exact: true }).click();
   await expect(page).toHaveURL(/\/google\/set-password$/);
   await page.reload(); // Setup survives reload using only the HttpOnly cookie.
@@ -61,6 +70,7 @@ test("Google-only registration, password setup, both logins and Google-only reco
   const authCookies = await page.context().cookies();
   const setup = authCookies.find((cookie) => cookie.name === "venueGoogleSetup");
   expect(setup.httpOnly).toBe(true);
+  expect(setup.sameSite).toBe("Lax");
   expect(setup.path).toBe("/api/auth/google");
   await page.getByRole("button", { name: "Complete registration" }).click();
   await expect(page).toHaveURL(/\/venues\/new$/);
@@ -94,8 +104,69 @@ test("Google-only registration, password setup, both logins and Google-only reco
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(page).toHaveURL(/\/venues$/);
   expect(requests.some((url) => /credential=|testOnly=|venueGoogleSetup=/.test(url))).toBe(false);
-  expect(await page.evaluate(() => JSON.stringify(history.state))).not.toContain("credential");
+  const authRequests = requests
+    .map((url) => new URL(url))
+    .filter((url) => url.pathname.startsWith("/api/auth/"));
+  expect(authRequests.length).toBeGreaterThan(0);
+  expect(authRequests.every((url) => url.origin === new URL(page.url()).origin)).toBe(true);
+  const browserState = await page.evaluate(() =>
+    JSON.stringify({ history: history.state, localStorage, sessionStorage }),
+  );
+  expect(/credential|venue-browser-fixture|venueGoogleSetup/.test(browserState)).toBe(false);
   expect(errors).toEqual([]);
+});
+
+test.describe("Google authorization cookie recovery", () => {
+  test.use({ serviceWorkers: "block" });
+
+  test("a missing challenge cookie shows a session error and a fresh Google retry completes registration", async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      window.testGoogleSubject = "google-browser-cookie-retry";
+      window.testGoogleEmail = "google-browser-cookie-retry@gmail.com";
+    });
+    await page.goto("/register");
+    const googleButton = page.getByRole("button", {
+      name: "Continue with Google",
+      exact: true,
+    });
+    await expect(googleButton).toBeVisible();
+    const originalChallenge = (await page.context().cookies()).find(
+      (cookie) => cookie.name === "venueGoogleChallenge",
+    );
+    expect(Boolean(originalChallenge)).toBe(true);
+    // Reproduce a browser dropping the authorization cookie while preserving
+    // the ID token and nonce returned by Google.
+    await page.context().clearCookies({ name: "venueGoogleChallenge" });
+    const failureResponse = page.waitForResponse(
+      (response) =>
+        new URL(response.url()).pathname === "/api/auth/google" &&
+        response.request().method() === "POST",
+    );
+    await googleButton.click();
+    const failed = await failureResponse;
+    expect(failed.status()).toBe(401);
+    expect((await failed.json()).code).toBe("GOOGLE_SESSION_MISSING");
+    await expect(page.getByRole("alert")).toContainText(
+      "Your sign-in session could not be saved. Reload this page and try again.",
+    );
+    await expect(page).toHaveURL(/\/register$/);
+    await expect(page.locator('input[type="password"]')).toHaveCount(0);
+
+    await page.getByRole("button", { name: "Try Google again", exact: true }).click();
+    await expect(googleButton).toBeVisible();
+    const freshChallenge = (await page.context().cookies()).find(
+      (cookie) => cookie.name === "venueGoogleChallenge",
+    );
+    expect(Boolean(freshChallenge)).toBe(true);
+    expect(freshChallenge.value === originalChallenge.value).toBe(false);
+    await googleButton.click();
+    await expect(page).toHaveURL(/\/google\/set-password$/);
+    await choosePassword(page);
+    await page.getByRole("button", { name: "Complete registration" }).click();
+    await expect(page).toHaveURL(/\/venues\/new$/);
+  });
 });
 
 test("unlinked legacy recovery is denied; explicit current-password linking enables Google", async ({

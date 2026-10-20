@@ -19,6 +19,32 @@ booking, payment or subscription email notifications.
 
 ## Registration and login
 
+Production browser requests use the frontend's `/api` path. Netlify proxies it
+to `https://venue-booking-saas.onrender.com/api`, retaining the frontend origin
+for host-only HttpOnly session and Google-setup cookies. The production client
+uses `/api` even if an old absolute `VITE_VENUE_API_URL` value remains configured.
+Development still supports that variable for a local API server.
+
+Do not call the Render hostname directly from `https://prakashsaas.world` with
+the default `SameSite=Lax` cookie policy: that is a cross-site browser request
+and cannot carry these cookies. The proxy fixes delivery without relaxing
+SameSite, CSRF, Google nonce verification or single-use expiration checks.
+If the Render hostname changes, update the first `/api/*` rewrite in
+`client/public/_redirects` and redeploy the frontend. Keep the actual frontend
+origins in Render's `VENUE_CORS_ALLOWED_ORIGINS` and Google Console's authorized
+JavaScript origins; never add a wildcard to authenticated CORS origins.
+
+After deployment, `https://prakashsaas.world/api/health` must return the API's
+JSON response rather than the SPA document. Test a fresh Google sign-in and
+session persistence in a real browser. The Netlify proxy adds a forwarding hop;
+verify the deployed forwarding chain before configuring `VENUE_TRUST_PROXY_HOPS`
+so rate limits identify clients correctly. Do not increase proxy trust blindly
+or use arbitrary client-supplied IP headers.
+
+The API distinguishes a missing browser challenge cookie with the safe error
+code `GOOGLE_SESSION_MISSING`; expired or consumed authorizations still fail
+normally. No diagnostic includes a credential or cookie value.
+
 `POST /api/auth/google/challenge` accepts only a `purpose` of `register`, `login`,
 or `recover`. It issues a five-minute HttpOnly challenge cookie and returns a
 nonce for Google Identity Services. `POST /api/auth/google` accepts only the
@@ -88,3 +114,10 @@ RSA tokens and stub only Google's certificate retrieval, exercising the real
 Google verification SDK. Browser tests simulate Google UI/provider responses
 only inside the disposable browser-test server. Live Google consent and
 production OAuth-origin configuration require a separate deployment smoke test.
+
+The production-cookie fix was validated with 77 backend tests, 37 client unit
+tests and all 20 Playwright browser tests passing, plus client lint and the
+production build. Regressions cover a missing challenge cookie followed by a
+fresh successful retry, same-origin auth calls, protected cookie attributes,
+expired/replayed grants, legacy linking and unpaid hall restrictions. These
+results do not claim a deployed Netlify proxy or live Google consent test.

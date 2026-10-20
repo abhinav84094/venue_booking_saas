@@ -1,3 +1,7 @@
+# Keep session and Google setup cookies on the frontend origin. This is a
+# proxy rewrite, never a browser redirect to the cross-site Render hostname.
+/api/*  https://venue-booking-saas.onrender.com/api/:splat  200!
+
 # Existing files are served first (no forced rules). Missing build assets must
 # return a real 404 rather than the SPA document with a JavaScript MIME error.
 /assets/*                 /static-not-found.txt  404

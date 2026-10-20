@@ -11,7 +11,11 @@ import {
 } from "../src/pwa/policy.js";
 
 test("owner PWA permits only the exact HTTPS production origins and local development", () => {
-  for (const hostname of ["venue.prakashsaas.com", "venue-booking-saas.netlify.app"]) {
+  for (const hostname of [
+    "prakashsaas.world",
+    "venue.prakashsaas.com",
+    "venue-booking-saas.netlify.app",
+  ]) {
     assert.equal(isOwnerOrigin({ hostname, protocol: "https:" }), true, hostname);
     assert.equal(isOwnerOrigin({ hostname, protocol: "http:" }), false, hostname);
     assert.equal(isOwnerOrigin({ hostname, protocol: "https:", port: "4443" }), false);
@@ -24,6 +28,8 @@ test("owner PWA permits only the exact HTTPS production origins and local develo
   for (const hostname of [
     "grandhall.venue.prakashsaas.com",
     "grandhall.prakashsaas.com",
+    "grandhall.prakashsaas.world",
+    "prakashsaas.world.attacker.test",
     "venue.prakashsaas.com.attacker.test",
     "attacker-venue-booking-saas.netlify.app",
     "deploy-preview-10--venue-booking-saas.netlify.app",

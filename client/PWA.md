@@ -23,8 +23,9 @@ The existing login route sends authenticated users to their permitted venue list
 or administrator page. Hall access still requires a verified paid subscription.
 An unauthenticated launch shows the existing sign-in screen.
 
-`src/pwa/policy.js` allows only HTTPS `venue.prakashsaas.com` and
-`venue-booking-saas.netlify.app`, plus loopback/localhost for local browser tests.
+`src/pwa/policy.js` allows HTTPS `prakashsaas.world`, the original
+`venue.prakashsaas.com` alias and `venue-booking-saas.netlify.app`, plus
+loopback/localhost for local browser tests.
 Preview deployments, other hosts and customer subdomains do not opt in.
 Public `/v/:slug` routes never advertise the owner manifest, Apple metadata,
 install action or worker registration, even on the main owner origin.
@@ -75,8 +76,10 @@ The worker never caches `index.html`, navigation documents, authenticated
 HTML, API responses, credentials, cookies, account details, tenant records,
 booking availability, subscription status, checkout/verification results or
 administrative data. Same-origin API requests always use network/no-store.
-External Render, Google, Razorpay and image requests are left to the browser
+External Google, Razorpay and image requests are left to the browser
 and their providers; the worker does not intercept or cache their responses.
+Production Render API requests use the same-origin `/api` proxy and remain
+explicitly network-only/no-store.
 The backend's existing `Cache-Control: no-store` policy remains authoritative.
 
 The root scope is necessary because current owner routes span `/login`,
@@ -137,8 +140,16 @@ behavior still need a deployment smoke test on the intended devices.
 Keep base directory `client`, build command `npm run build` and publish directory
 `dist` relative to that base (`client/dist` in this repository). Deploy the whole
 build, including the manifest, worker, icons, offline assets, `_headers` and
-`_redirects`. Existing frontend API, OAuth, public-domain and Render cookie/CORS
+`_redirects`. Existing frontend OAuth, public-domain and Render cookie/CORS
 configuration continues to apply. This work does not modify DNS or deploy.
+
+The first `/api/*` rewrite proxies to `https://venue-booking-saas.onrender.com/api`.
+The production client always uses `/api`, preserving HttpOnly Google/session
+cookies on the frontend origin. Keep this rewrite before the SPA fallback.
+An absolute `VITE_VENUE_API_URL` remains available only for development. Update
+the rewrite target if the backend service hostname changes; the proxy retains
+the frontend `Origin`, so authenticated Render CORS/CSRF must allow the exact
+frontend hostname. Missing API routes must return backend JSON, not SPA HTML.
 
 `_redirects` preserves the existing final SPA rewrite. Earlier unforced static
 rules return a real 404 for missing scripts, icons and worker files instead of

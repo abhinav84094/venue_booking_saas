@@ -1,6 +1,7 @@
 // Owner-app identity is an exact origin allowlist. Customer subdomains and
 // public /v routes must never advertise or register the owner PWA.
 export const OWNER_HOSTNAMES = Object.freeze([
+  "prakashsaas.world",
   "venue.prakashsaas.com",
   "venue-booking-saas.netlify.app",
 ]);

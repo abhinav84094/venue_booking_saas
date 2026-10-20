@@ -1,8 +1,12 @@
 import axios from "axios";
+import { resolveApiBaseUrl } from "./apiBaseUrl";
 import { resourceCache } from "./resourceCache";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_VENUE_API_URL || "/api",
+  baseURL: resolveApiBaseUrl({
+    isProduction: import.meta.env.PROD,
+    configuredUrl: import.meta.env.VITE_VENUE_API_URL,
+  }),
   withCredentials: true,
   timeout: 15000,
   headers: {
