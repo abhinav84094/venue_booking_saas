@@ -15,6 +15,7 @@ export function Button({
       type={type}
       className={`btn btn-${variant} ${className}`}
       disabled={busy || disabled}
+      aria-busy={busy || undefined}
     >
       {busy ? <LoaderCircle size={17} className="spin" /> : null}
       {children}

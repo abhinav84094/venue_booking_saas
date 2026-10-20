@@ -71,7 +71,7 @@ export default function GoogleAuthButton({ purpose = "login", onLogin, onPasswor
   if (!configured)
     return <p role="status">Google sign-in is unavailable. Please contact support.</p>;
   return (
-    <div className="w-full space-y-3">
+    <div className="w-full space-y-3" aria-busy={loading || undefined}>
       <div ref={containerRef} className="flex min-h-11 w-full min-w-0 items-center justify-center">
         {loading || (!nonce && !error) ? (
           <p role="status">Preparing Google sign-in...</p>

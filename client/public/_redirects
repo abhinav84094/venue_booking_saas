@@ -1,2 +1,14 @@
+# Existing files are served first (no forced rules). Missing build assets must
+# return a real 404 rather than the SPA document with a JavaScript MIME error.
+/assets/*                 /static-not-found.txt  404
+/pwa-icons/*              /static-not-found.txt  404
+/sw.js                    /static-not-found.txt  404
+/manifest.webmanifest     /static-not-found.txt  404
+/offline.html             /static-not-found.txt  404
+/offline.css              /static-not-found.txt  404
+/offline.js               /static-not-found.txt  404
+/theme-init.js            /static-not-found.txt  404
+/favicon.svg              /static-not-found.txt  404
 
+# Preserve owner and public venue React Router deep links.
 /*    /index.html   200

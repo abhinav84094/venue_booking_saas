@@ -1,0 +1,170 @@
+/* Owner-only rules: public venue pages retain their existing presentation. */
+html[data-owner-app] .dashboard,
+html[data-owner-app] .dashboard-main,
+html[data-owner-app] .create-page,
+html[data-owner-app] .workspace-home {
+  min-width: 0;
+  max-width: 100%;
+}
+
+html[data-owner-app] .workspace-header {
+  padding-top: max(24px, env(safe-area-inset-top));
+  padding-left: max(5%, env(safe-area-inset-left));
+  padding-right: max(5%, env(safe-area-inset-right));
+}
+
+html[data-owner-app] .dashboard-topbar {
+  padding-top: max(14px, env(safe-area-inset-top));
+  padding-left: max(35px, env(safe-area-inset-left));
+  padding-right: max(35px, env(safe-area-inset-right));
+}
+
+html[data-owner-app] .auth-main {
+  padding-top: max(35px, env(safe-area-inset-top));
+  padding-left: max(8%, env(safe-area-inset-left));
+  padding-right: max(8%, env(safe-area-inset-right));
+}
+
+html[data-owner-app] .dashboard-content,
+html[data-owner-app] .create-main,
+html[data-owner-app] .venues-main,
+html[data-owner-app] .auth-main {
+  min-width: 0;
+  padding-bottom: max(32px, env(safe-area-inset-bottom));
+}
+
+html[data-owner-app] .sidebar {
+  padding-top: max(29px, env(safe-area-inset-top));
+  padding-bottom: max(20px, env(safe-area-inset-bottom));
+}
+
+html[data-owner-app] .btn,
+html[data-owner-app] .icon-btn {
+  min-height: 44px;
+}
+
+html[data-owner-app] .icon-btn {
+  min-width: 44px;
+}
+
+.pwa-install {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+.pwa-install > div {
+  flex: 1;
+  min-width: 200px;
+}
+.pwa-install h2 {
+  font-size: 1.65rem;
+  margin-bottom: 8px;
+}
+.pwa-install p {
+  line-height: 1.6;
+}
+.pwa-install-help {
+  flex-basis: 100%;
+}
+.pwa-auth-help {
+  margin-top: 20px;
+  color: var(--muted);
+  line-height: 1.65;
+}
+.pwa-auth-help summary {
+  cursor: pointer;
+  color: var(--ink);
+}
+.pwa-auth-help p {
+  margin-top: 10px;
+  overflow-wrap: anywhere;
+}
+.pwa-connection-screen {
+  min-height: 100dvh;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: max(32px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right))
+    max(32px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+}
+.pwa-connection-screen > .brand {
+  display: inline-flex;
+  margin-bottom: 40px;
+}
+.pwa-connection-screen h1 {
+  font-size: clamp(2rem, 7vw, 3rem);
+  margin: 12px 0 20px;
+}
+.pwa-connection-screen p {
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+.pwa-update-notice {
+  position: fixed;
+  right: max(18px, env(safe-area-inset-right));
+  bottom: max(18px, env(safe-area-inset-bottom));
+  left: max(18px, env(safe-area-inset-left));
+  z-index: 80;
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+.pwa-update-notice > div {
+  flex: 1;
+  min-width: 0;
+}
+.pwa-update-notice p {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  margin-top: 4px;
+}
+
+@media (max-width: 760px) {
+  html[data-owner-app] .dashboard-content,
+  html[data-owner-app] .create-main,
+  html[data-owner-app] .venues-main {
+    padding-left: max(17px, env(safe-area-inset-left));
+    padding-right: max(17px, env(safe-area-inset-right));
+  }
+  html[data-owner-app] .dashboard-topbar {
+    height: auto;
+    min-height: 72px;
+    padding-left: max(14px, env(safe-area-inset-left));
+    padding-right: max(14px, env(safe-area-inset-right));
+  }
+  html[data-owner-app] .workspace-header {
+    flex-wrap: wrap;
+  }
+  html[data-owner-app] .hall-subscription-actions {
+    flex-wrap: wrap;
+  }
+  html[data-owner-app] .sidebar nav a {
+    min-height: 44px;
+  }
+  html[data-owner-app] .breadcrumb > strong {
+    overflow-wrap: anywhere;
+  }
+  .pwa-update-notice {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .pwa-update-notice > div {
+    flex-basis: calc(100% - 56px);
+  }
+  .pwa-update-notice > .icon-btn {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+  }
+  .pwa-update-notice > div {
+    padding-right: 36px;
+  }
+}

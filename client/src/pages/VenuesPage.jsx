@@ -5,6 +5,7 @@ import { useAuth } from "../context/authContext";
 import { useResource } from "../hooks/useResource";
 import HallSubscriptionCard from "../components/HallSubscriptionCard";
 import { Brand, PageHeading, Loading, ErrorNotice, Empty, Button } from "../components/ui";
+import InstallApp from "../components/pwa/InstallApp";
 
 export default function VenuesPage() {
   const { data, loading, error, reload } = useResource("/venues");
@@ -58,6 +59,7 @@ export default function VenuesPage() {
           Select a hall to manage bookings, availability and customers. View each hall’s
           subscription and validity below.
         </PageHeading>
+        <InstallApp />
         <ErrorNotice error={error} />
         {error && <Button onClick={reload}>Try again</Button>}
         {loading ? (

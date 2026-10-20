@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#244638" />
+    <meta name="robots" content="noindex" />
+    <title>You're offline | Prakash SaaS Venue</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/offline.css" />
+    <script src="/offline.js" defer></script>
+  </head>
+  <body>
+    <main class="offline-card" aria-labelledby="offline-heading">
+      <img class="brand-mark" src="/pwa-icons/icon-192.png" width="72" height="72" alt="" />
+      <p class="brand-name">Prakash SaaS Venue</p>
+      <h1 id="offline-heading">You're offline</h1>
+      <p>
+        Connect to the internet to manage your venues, bookings, availability, and subscriptions.
+      </p>
+      <p class="offline-note">
+        Live availability and payment status need a fresh connection. Bookings and payments cannot
+        be completed offline.
+      </p>
+      <button id="retry-connection" type="button">Retry connection</button>
+      <p class="offline-status" id="connection-status" role="status" aria-live="polite"></p>
+    </main>
+  </body>
+</html>

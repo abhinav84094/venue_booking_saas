@@ -1,0 +1,80 @@
+:root {
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  color: #354938;
+  background: #faf9f6;
+  line-height: 1.6;
+  font-synthesis: none;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  min-width: 280px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: max(24px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right))
+    max(24px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+}
+.offline-card {
+  width: min(100%, 470px);
+  padding: clamp(24px, 6vw, 48px);
+  text-align: center;
+  background: #fff;
+  border: 1px solid #dce2d6;
+  border-radius: 24px;
+  box-shadow: 0 8px 28px #142c2012;
+}
+.brand-mark {
+  display: block;
+  margin: 0 auto 16px;
+  border-radius: 18px;
+}
+.brand-name {
+  color: #244638;
+  font-weight: 600;
+  margin: 0 0 24px;
+}
+h1 {
+  color: #263e32;
+  font:
+    400 clamp(2rem, 7vw, 2.6rem)/1.2 Georgia,
+    serif;
+  margin: 0 0 20px;
+}
+p {
+  margin: 0 0 20px;
+  overflow-wrap: anywhere;
+}
+.offline-note {
+  color: #596454;
+  font-size: 0.9rem;
+}
+button {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 20px;
+  border: 0;
+  border-radius: 10px;
+  background: #244638;
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+button:hover {
+  background: #18392b;
+}
+button:focus-visible {
+  outline: 3px solid #8b672f;
+  outline-offset: 4px;
+}
+.offline-status {
+  min-height: 1.5em;
+  margin: 16px 0 0;
+  color: #596454;
+  font-size: 0.875rem;
+}

@@ -19,9 +19,12 @@ try {
   const app = createApp();
   await attachClient(app);
   attachErrorHandlers(app);
+
+
   const server = app.listen(Number(process.env.PORT || 5000), () =>
     console.log(`Prakash SaaS: Venue Booking API is listening on port ${process.env.PORT || 5000}`),
   );
+  
   const shutdown = () =>
     server.close(async () => {
       await mongoose.disconnect();

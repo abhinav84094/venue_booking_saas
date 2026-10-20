@@ -6,6 +6,7 @@ import { useAuthFlow } from "../features/auth/hooks/useAuthFlow";
 import GoogleAuthButton from "../components/GoogleAuthButton";
 import GooglePasswordSetup from "../components/GooglePasswordSetup";
 import { Brand, Button, Field, ErrorNotice, Notice } from "../components/ui";
+import StandaloneAuthHelp from "../components/pwa/StandaloneAuthHelp";
 
 const copy = {
   login: ["Welcome back.", "Your next great event starts here."],
@@ -118,6 +119,7 @@ export default function AuthPage({ mode = "login" }) {
               <Link to="/login">Back to sign in</Link>
             )}
           </p>
+          <StandaloneAuthHelp mode={mode} />
         </div>
         <p className="auth-bottom">Your next chapter deserves a beautiful space.</p>
       </main>

@@ -4,6 +4,7 @@ import { ArrowLeft, LogOut, Save } from "lucide-react";
 import { useAuth } from "../context/authContext";
 import api from "../services/api";
 import { Brand, Button, ErrorNotice, Field, Notice, PageHeading } from "../components/ui";
+import InstallApp from "../components/pwa/InstallApp";
 
 export default function AccountPage() {
   const { user, refreshUser, logout } = useAuth();
@@ -60,6 +61,7 @@ export default function AccountPage() {
             Save account
           </Button>
         </form>
+        <InstallApp />
         <Button
           variant="secondary"
           onClick={async () => {

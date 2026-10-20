@@ -1,4 +1,5 @@
 import { fileURLToPath } from "node:url";
+import { readFile } from "node:fs/promises";
 import { mock } from "node:test";
 import { Writable } from "node:stream";
 // Disposable local server used only by the explicitly requested automated UI tests.
@@ -13,6 +14,7 @@ import { getRazorpay } from "../config/razorpay.js";
 import { getCloudinary } from "../config/cloudinary.js";
 import { OAuth2Client } from "google-auth-library";
 import GoogleAuthorization from "../models/GoogleAuthorization.js";
+import { apiLimiters } from "../middleware/rateLimitMiddleware.js";
 process.env.NODE_ENV = "test";
 process.env.VENUE_PLAN_3_MONTHS_PRICE = "500";
 process.env.VENUE_PLAN_1_YEAR_PRICE = "1500";
@@ -125,6 +127,31 @@ await User.create({
   emailVerified: true,
 });
 const app = createApp();
+// Disposable fixture: change actual worker bytes without rebuilding files while
+// a browser is using them. This endpoint never exists in the production server.
+let browserWorkerVersion = 0;
+app.post("/__browser-tests/reset-rate-limits", async (req, res) => {
+  await Promise.all(Object.values(apiLimiters).map((limiter) => limiter.resetKey(req.ip)));
+  res.json({ success: true });
+});
+app.post("/__browser-tests/pwa-worker-version", (req, res) => {
+  const version = req.body?.version;
+  if (!Number.isInteger(version) || version < 0 || version > 100)
+    return res.status(400).json({ success: false });
+  browserWorkerVersion = version;
+  res.json({ success: true });
+});
+app.get("/sw.js", async (_req, res) => {
+  const source = await readFile(new URL("../../client/dist/sw.js", import.meta.url), "utf8");
+  res.set({
+    "Cache-Control": "no-store",
+    "Service-Worker-Allowed": "/",
+    "Content-Security-Policy": "default-src 'self'; connect-src 'self'; script-src 'self'",
+  });
+  res
+    .type("application/javascript")
+    .send(`${source}\n/* browser fixture ${browserWorkerVersion} */`);
+});
 await attachClient(app);
 attachErrorHandlers(app);
 const server = app.listen(5600, "127.0.0.1", () =>

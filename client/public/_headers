@@ -1,0 +1,35 @@
+# Keep navigation fresh, including requests before a service worker is active.
+/*
+  Cache-Control: no-cache
+  X-Content-Type-Options: nosniff
+  Cross-Origin-Opener-Policy: same-origin-allow-popups
+
+/sw.js
+  Content-Type: application/javascript; charset=utf-8
+  Cache-Control: no-cache, no-store, must-revalidate
+  Service-Worker-Allowed: /
+
+/manifest.webmanifest
+  Content-Type: application/manifest+json; charset=utf-8
+  Cache-Control: no-cache, must-revalidate
+
+/offline.html
+  Content-Type: text/html; charset=utf-8
+  Cache-Control: no-cache, must-revalidate
+
+/offline.css
+  Content-Type: text/css; charset=utf-8
+  Cache-Control: no-cache, must-revalidate
+
+/offline.js
+  Content-Type: application/javascript; charset=utf-8
+  Cache-Control: no-cache, must-revalidate
+
+/pwa-icons/*.png
+  Content-Type: image/png
+
+/assets/*.js
+  Content-Type: application/javascript; charset=utf-8
+
+/assets/*.css
+  Content-Type: text/css; charset=utf-8
