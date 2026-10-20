@@ -1,0 +1,112 @@
+.calendar-panel {
+  padding: 24px;
+  overflow-x: auto;
+}
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+  min-width: 560px;
+}
+.calendar-weekday {
+  text-align: center;
+  font-size: 0.875rem;
+  padding: 13px 2px;
+  background: var(--surface);
+  color: var(--muted);
+  border-bottom: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+}
+.calendar-day,
+.calendar-pad {
+  min-height: 115px;
+  border: 0;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+  padding: 10px;
+  text-align: left;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-size: 0.875rem;
+}
+.calendar-pad {
+  background: var(--surface);
+}
+.calendar-day:hover {
+  background: var(--surface-hover);
+}
+.calendar-day.selected {
+  box-shadow: inset 0 0 0 2px var(--focus);
+  background: var(--surface-selected);
+}
+.calendar-day > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.calendar-event,
+.calendar-block {
+  font-size: 0.875rem;
+  border-radius: 3px;
+  background: var(--warning-surface);
+  color: var(--warning-text);
+  padding: 3px 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.calendar-block {
+  background: var(--warning-surface);
+  color: var(--warning-text);
+}
+.calendar-day small {
+  font-size: 0.875rem;
+}
+.calendar-legend {
+  display: flex;
+  gap: 18px;
+  padding-bottom: 12px;
+  flex-wrap: wrap;
+}
+.calendar-legend span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+.calendar-legend i {
+  height: 7px;
+  width: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.legend-event {
+  background: var(--positive-text);
+}
+.legend-block {
+  background: var(--warning-text);
+}
+.availability-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 17px 0;
+  border-bottom: 1px solid var(--line);
+  gap: 15px;
+  flex-wrap: wrap;
+}
+.availability-row strong {
+  font-weight: 500;
+  font-size: 0.9375rem;
+  color: var(--ink);
+}
+.availability-row p {
+  font-size: 1rem;
+  color: var(--muted);
+  margin: 7px 0 0;
+}

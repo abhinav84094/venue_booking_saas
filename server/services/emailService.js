@@ -1,59 +1,19 @@
 import { Resend } from "resend";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-export const sendVerificationOtp = async (email, otp) => {
-  const { data, error } = await resend.emails.send({
-    from: "Clinic SaaS <onboarding@resend.dev>",
+import { fail } from "../utils/errors.js";
+async function sendCode(email, otp, purpose) {
+  if (!process.env.VENUE_RESEND_API_KEY || !process.env.VENUE_EMAIL_FROM)
+    throw fail(
+      "Transactional email is not configured. Configure Resend and a verified sender.",
+      503,
+    );
+  const { data, error } = await new Resend(process.env.VENUE_RESEND_API_KEY).emails.send({
+    from: process.env.VENUE_EMAIL_FROM,
     to: email,
-    subject: "Verify your email",
-    html: `
-      <h2>Email Verification</h2>
-
-      <p>Your verification code is:</p>
-
-      <h1>${otp}</h1>
-
-      <p>This code will expire in 10 minutes.</p>
-
-      <p>If you did not create this account, you can ignore this email.</p>
-    `,
+    subject: `${purpose} - Prakash SaaS`,
+    html: `<h2>Prakash SaaS</h2><p>${purpose}</p><p>Your code is <strong>${otp}</strong>. It expires in 10 minutes.</p><p>If you did not request this code, ignore this email.</p>`,
   });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
+  if (error) throw fail("Unable to deliver email. Please try requesting a new code later.", 503);
   return data;
-};
-
-
-
-
-export const sendPasswordResetOtp = async (email, otp) => {
-  const { data, error } = await resend.emails.send({
-    from: "Clinic SaaS <onboarding@resend.dev>",
-    to: email,
-    subject: "Reset your password",
-    html: `
-      <h2>Password Reset Request</h2>
-
-      <p>We received a request to reset your password.</p>
-
-      <p>Your password reset code is:</p>
-
-      <h1>${otp}</h1>
-
-      <p>This code will expire in 10 minutes.</p>
-
-      <p>If you did not request a password reset,
-      you can safely ignore this email.</p>
-    `,
-  });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data;
-};
+}
+export const sendVerificationOtp = (email, otp) => sendCode(email, otp, "Verify your email");
+export const sendPasswordResetOtp = (email, otp) => sendCode(email, otp, "Reset your password");

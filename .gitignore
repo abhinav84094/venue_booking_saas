@@ -24,3 +24,7 @@ build/
 Thumbs.db
 
 frontend/vite.config.js
+# Automated browser test artifacts
+client/test-results/
+client/playwright-report/
+artifacts/

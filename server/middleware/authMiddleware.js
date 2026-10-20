@@ -1,81 +1,30 @@
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 import User from "../models/User.js";
-
-export const protect = async (req, res, next) => {
+import { AUTH_COOKIE, publicUser } from "../utils/authCookie.js";
+import { must } from "../utils/errors.js";
+export async function protect(req, _res, next) {
   try {
-    const token = req.cookies?.accessToken;
-
-    if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: "Authentication required",
-      });
-    }
-
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET,
-      { algorithms: ["HS256"] }
+    must(req.cookies?.[AUTH_COOKIE], "Authentication required", 401);
+    const decoded = jwt.verify(req.cookies[AUTH_COOKIE], process.env.VENUE_JWT_SECRET, {
+      algorithms: ["HS256"],
+    });
+    must(mongoose.isObjectIdOrHexString(decoded.userId), "Invalid session", 401);
+    const user = await User.findById(decoded.userId).select(
+      "name email role emailVerified suspended tokenVersion",
     );
-
-    const user = await User.findById(decoded.userId)
-      .select("-password -emailVerificationOtpHash");
-
-    if (!user) {
-        return res.status(401).json({
-            success: false,
-            message: "User account not found",
-        });
-    }
-
-    if (decoded.tokenVersion !== (user.tokenVersion ?? 0)) {
-        return res.status(401).json({
-            success: false,
-            message: "Session expired. Please log in again.",
-        });
-    }
-
-    if (!user.emailVerified) {
-      return res.status(403).json({
-        success: false,
-        message: "Please verify your email",
-      });
-    }
-
+    must(
+      user && decoded.tokenVersion === (user.tokenVersion ?? 0),
+      "Session expired. Sign in again.",
+      401,
+    );
+    must(user.emailVerified && !user.suspended, "Account is unverified or suspended", 403);
     req.user = user;
-
     next();
   } catch (error) {
-    if (
-      error.name === "JsonWebTokenError" ||
-      error.name === "TokenExpiredError" ||
-      error.name === "NotBeforeError"
-    ) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid or expired authentication token",
-      });
-    }
-
-    console.error("Authentication middleware error:", error);
-
-    return res.status(500).json({
-      success: false,
-      message: "Authentication failed due to server error",
-    });
+    if (["JsonWebTokenError", "TokenExpiredError", "NotBeforeError"].includes(error.name))
+      error.statusCode = 401;
+    next(error);
   }
-};
-
-
-export const getMe = async (req, res) => {
-  return res.status(200).json({
-    success: true,
-    user: {
-      id: req.user._id,
-      name: req.user.name,
-      email: req.user.email,
-      role: req.user.role,
-      emailVerified: req.user.emailVerified,
-    },
-  });
-};
+}
+export const getMe = (req, res) => res.json({ success: true, user: publicUser(req.user) });

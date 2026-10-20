@@ -1,0 +1,109 @@
+/* Smaller screens keep the work close at hand. */
+@media (min-width: 1600px) {
+  .dashboard-content {
+    padding: 45px 50px;
+  }
+  .dashboard-topbar {
+    padding: 12px 50px;
+  }
+}
+@media (max-width: 1200px) {
+  .landing-hero {
+    gap: 5%;
+    padding-top: 35px;
+  }
+  .hero-art {
+    min-height: 510px;
+  }
+  .hero-copy h1 {
+    font-size: 4.6rem;
+  }
+  .floating-note {
+    left: -20px;
+    bottom: 85px;
+    padding: 13px;
+  }
+  .art-building {
+    bottom: 125px;
+    height: 205px;
+  }
+  .art-tree {
+    height: 155px;
+    width: 65px;
+  }
+  .landing-header nav {
+    gap: 22px;
+  }
+  .venue-types p span {
+    margin: 0 16px;
+  }
+  .sidebar {
+    width: 220px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+  .dashboard-main {
+    margin-left: 220px;
+  }
+  .dashboard-content {
+    padding: 28px 25px;
+  }
+  .dashboard-topbar {
+    padding: 12px 25px;
+  }
+  .stat-grid {
+    gap: 12px;
+  }
+  .stat-card {
+    padding: 19px 16px;
+  }
+  .stat-card strong {
+    font-size: 1.9rem;
+  }
+  .stat-card p {
+    font-size: 0.875rem;
+  }
+  .overview-grid {
+    grid-template-columns: minmax(0, 1.7fr) minmax(220px, 1fr);
+    gap: 18px;
+  }
+  .page-heading h1 {
+    font-size: 2.5rem;
+  }
+  .panel {
+    padding: 23px;
+  }
+  .page-heading > .btn {
+    font-size: 0.9375rem;
+    padding: 11px 14px;
+  }
+  .auth-story {
+    padding: 40px;
+  }
+  .public-header nav {
+    gap: 22px;
+  }
+  .public-header {
+    gap: 20px;
+  }
+  .public-hero {
+    min-height: 600px;
+  }
+  .public-hall-image {
+    height: 265px;
+  }
+  .public-hall-content > div:first-child {
+    flex-wrap: wrap;
+    gap: 9px;
+  }
+  .public-enquire {
+    gap: 7%;
+    padding: 75px 6%;
+  }
+  .public-enquire > .enquiry-form {
+    padding: 28px;
+  }
+  .calendar-day {
+    height: 90px;
+  }
+}

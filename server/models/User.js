@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
-
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -23,7 +22,7 @@ const userSchema = new mongoose.Schema(
       required: true,
       minlength: 8,
     },
-    
+
     googleId: {
       type: String,
       unique: true,
@@ -31,12 +30,13 @@ const userSchema = new mongoose.Schema(
       immutable: true,
     },
 
-
     role: {
       type: String,
-      enum: ["owner", "doctor", "staff"],
+      enum: ["owner", "staff", "platform_admin"],
       default: "owner",
     },
+    suspended: { type: Boolean, default: false },
+    emailVerificationAttempts: { type: Number, default: 0, min: 0 },
     emailVerified: {
       type: Boolean,
       default: false,
@@ -76,9 +76,8 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
-
 
 userSchema.pre("save", async function () {
   if (!this.isModified("password")) {
@@ -87,7 +86,6 @@ userSchema.pre("save", async function () {
 
   this.password = await bcrypt.hash(this.password, 12);
 });
-
 
 userSchema.methods.comparePassword = async function (enteredPassword) {
   return bcrypt.compare(enteredPassword, this.password);

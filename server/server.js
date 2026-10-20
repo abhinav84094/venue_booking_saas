@@ -1,93 +1,34 @@
 import "dotenv/config";
-import express from "express";
-import connectDB from "./config/db.js";
-import authRoutes from "./routes/authRoutes.js"
-import cookieParser from "cookie-parser";
-import clinicRoutes from "./routes/clinicRoutes.js";
-import doctorRoutes from './routes/doctorRoutes.js';
-import publicClinicRoutes from "./routes/publicClinicRoutes.js"
-import serviceRoutes from "./routes/serviceRoutes.js";
-import doctorServiceRoutes from "./routes/doctorServiceRoutes.js";
-import scheduleRoutes from "./routes/scheduleRoutes.js";
-
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import { protect } from "./middleware/authMiddleware.js";
-import { handleRazorpayWebhook } from "./controllers/razorpayWebhookController.js";
-import corsMiddleware from "./middleware/corsMiddleware.js";
-import { configureProxyTrust } from "./middleware/rateLimitMiddleware.js";
-
-const app = express();
-configureProxyTrust(app);
-
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const PORT = process.env.PORT || 5000;
-
-app.use(corsMiddleware);
-
-
-app.post(
-  "/api/webhooks/razorpay",
-  express.raw({ type: "application/json" }),
-  handleRazorpayWebhook
-);
-
-
-
-app.use(express.json());
-app.use(cookieParser());
-
-if (process.env.NODE_ENV !== "production") {
-  app.get("/test-checkout", protect, (req, res) => {
-    res.sendFile(path.join(__dirname, "test-checkout.html"));
-  });
+import mongoose from "mongoose";
+import { validateEnvironment } from "./config/env.js";
+import connectDB, { assertHallMigrationComplete } from "./config/db.js";
+import { syncEnvironmentPlans } from "./services/subscriptionPlanService.js";
+import User from "./models/User.js";
+import { initializeIndexes } from "./models/venueModels.js";
+import { createApp, attachErrorHandlers } from "./app.js";
+import { attachClient } from "./services/seoService.js";
+try {
+  validateEnvironment();
+  await connectDB();
+  await assertHallMigrationComplete();
+  await User.init();
+  await initializeIndexes();
+  await syncEnvironmentPlans();
+  const app = createApp();
+  await attachClient(app);
+  attachErrorHandlers(app);
+  const server = app.listen(Number(process.env.PORT || 5000), () =>
+    console.log(`Prakash SaaS: Venue Booking API is listening on port ${process.env.PORT || 5000}`),
+  );
+  const shutdown = () =>
+    server.close(async () => {
+      await mongoose.disconnect();
+      process.exit(0);
+    });
+  process.once("SIGTERM", shutdown);
+  process.once("SIGINT", shutdown);
+} catch (error) {
+  console.error(error.message);
+  await mongoose.disconnect();
+  process.exitCode = 1;
 }
-
-app.use("/api/auth", authRoutes);
-app.use("/api/clinics", clinicRoutes);
-app.use("/api/clinics/:clinicId/doctors", doctorRoutes);
-app.use("/api/public/clinics", publicClinicRoutes);
-app.use("/api/clinics/:clinicId/services",serviceRoutes);
-app.use("/api/clinics/:clinicId/doctor-services",doctorServiceRoutes);
-app.use("/api/clinics/:clinicId/schedules",  scheduleRoutes);
-
-app.get("/api/health", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "Clinic SaaS API is running",
-  });
-});
-
-
-app.use((err, req, res, next) => {
-  console.error("API ERROR:", err);
-
-  const statusCode =
-    Number.isInteger(err.statusCode) &&
-    err.statusCode >= 400 &&
-    err.statusCode <= 599
-      ? err.statusCode
-      : 500;
-
-  const message =
-    typeof err.message === "string"
-      ? err.message
-      : typeof err.error?.description === "string"
-        ? err.error.description
-        : "Internal server error";
-
-  return res.status(statusCode).json({
-    success: false,
-    message: statusCode === 500
-      ? "Internal server error"
-      : message,
-  });
-});
-
-app.listen(PORT, async () => {
-    await connectDB();
-  console.log(`Server running on port ${PORT}`);
-});

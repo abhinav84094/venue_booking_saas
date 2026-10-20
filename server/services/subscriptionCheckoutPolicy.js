@@ -1,18 +1,3 @@
-export const CHECKOUT_WINDOW_MS = 3600000;
-export const checkoutExpiry = record => new Date(
-  record.expiresAt || new Date(record.createdAt).getTime() + CHECKOUT_WINDOW_MS
-);
-
-// Existing captured orders always retain their signed/local price snapshot.
-// Initiating an old-price checkout is allowed only during its original quote window.
-export const canReuseQuote = (record, currentAmount, now = Date.now()) =>
-  Number.isSafeInteger(record.amount) && record.amount > 0 &&
-  (record.amount === currentAmount || checkoutExpiry(record).getTime() > now);
-
-export const clearedCheckoutLock = Object.freeze({
-  paymentOrderLock: null, paymentOrderLockedAt: null, paymentOrderDraft: null,
-});
-
 // Razorpay's receipt filter can return partial matches. Paginate and compare exactly.
 export async function findOrdersByReceipt(razorpay, receipt) {
   if (typeof receipt !== "string" || !receipt || receipt.length > 40) {

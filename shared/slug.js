@@ -1,11 +1,17 @@
-
 const RESERVED_SLUGS = new Set([
   "admin",
   "api",
   "app",
   "auth",
   "booking",
-  "clinics",
+  "venues",
+  "venue",
+  "mail",
+  "static",
+  "assets",
+  "staging",
+  "dev",
+  "status",
   "dashboard",
   "help",
   "login",
@@ -27,12 +33,12 @@ export const normalizeSlug = (value) => {
   return value.trim().toLowerCase();
 };
 
-export const suggestSlug = (clinicName) => {
-  if (typeof clinicName !== "string") {
+export const suggestSlug = (venueName) => {
+  if (typeof venueName !== "string") {
     return "";
   }
 
-  return clinicName
+  return venueName
     .normalize("NFKD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
@@ -57,8 +63,7 @@ export const validateSlug = (value) => {
     return {
       valid: false,
       slug,
-      reason:
-        "Slug may contain only letters, numbers, and hyphens between words",
+      reason: "Slug may contain only letters, numbers, and hyphens between words",
     };
   }
 

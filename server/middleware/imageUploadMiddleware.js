@@ -1,32 +1,20 @@
-
 import multer from "multer";
 
 const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
 
-const allowedMimeTypes = new Set([
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-]);
+const allowedMimeTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 function hasValidImageSignature(buffer) {
   if (!Buffer.isBuffer(buffer)) return false;
 
   // JPEG
   const isJpeg =
-    buffer.length >= 3 &&
-    buffer[0] === 0xff &&
-    buffer[1] === 0xd8 &&
-    buffer[2] === 0xff;
+    buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
 
   // PNG
-  const pngSignature = Buffer.from([
-    137, 80, 78, 71, 13, 10, 26, 10,
-  ]);
+  const pngSignature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
 
-  const isPng =
-    buffer.length >= 8 &&
-    buffer.subarray(0, 8).equals(pngSignature);
+  const isPng = buffer.length >= 8 && buffer.subarray(0, 8).equals(pngSignature);
 
   // WebP
   const isWebp =
@@ -43,15 +31,13 @@ const upload = multer({
   limits: {
     fileSize: MAX_IMAGE_BYTES,
     files: 1,
+    fields: 0,
+    parts: 1,
   },
 
   fileFilter: (req, file, callback) => {
     if (!allowedMimeTypes.has(file.mimetype)) {
-      return callback(
-        new Error(
-          "Only JPG, PNG and WebP images are allowed"
-        )
-      );
+      return callback(new Error("Only JPG, PNG and WebP images are allowed"));
     }
 
     callback(null, true);
@@ -69,13 +55,9 @@ export function uploadSingleImage(req, res, next) {
       });
     }
 
-    if (
-      !req.file ||
-      !hasValidImageSignature(req.file.buffer)
-    ) {
+    if (!req.file || !hasValidImageSignature(req.file.buffer)) {
       return res.status(400).json({
-        message:
-          "Please upload a valid JPG, PNG or WebP image",
+        message: "Please upload a valid JPG, PNG or WebP image",
       });
     }
 

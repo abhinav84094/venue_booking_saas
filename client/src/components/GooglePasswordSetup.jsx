@@ -1,28 +1,15 @@
-
 import { useState } from "react";
 
-import {
-  Lock,
-  Eye,
-  EyeOff,
-  LoaderCircle,
-  AlertCircle,
-  ShieldCheck,
-} from "lucide-react";
+import { Lock, Eye, EyeOff, LoaderCircle, AlertCircle, ShieldCheck } from "lucide-react";
 
 import api from "../services/api";
 
-export default function GooglePasswordSetup({
-  credential,
-  email,
-  onComplete,
-}) {
+export default function GooglePasswordSetup({ credential, email, onComplete }) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] =
-    useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -52,19 +39,14 @@ export default function GooglePasswordSetup({
     setLoading(true);
 
     try {
-      const { data } = await api.post(
-        "/auth/google/complete-signup",
-        {
-          credential,
-          password,
-          confirmPassword,
-        }
-      );
+      const { data } = await api.post("/auth/google/complete-signup", {
+        credential,
+        password,
+        confirmPassword,
+      });
 
       if (!data.success || !data.user?.id) {
-        throw new Error(
-          data.message || "Unable to complete registration."
-        );
+        throw new Error(data.message || "Unable to complete registration.");
       }
 
       await onComplete(data.user);
@@ -72,7 +54,7 @@ export default function GooglePasswordSetup({
       setError(
         err.response?.data?.message ||
           err.message ||
-          "Unable to complete signup. Please try again."
+          "Unable to complete signup. Please try again.",
       );
     } finally {
       setLoading(false);
@@ -97,9 +79,7 @@ export default function GooglePasswordSetup({
               Google account verified
             </p>
 
-            <p className="mt-1 break-all text-sm text-blue-700 dark:text-blue-300">
-              {email}
-            </p>
+            <p className="mt-1 break-all text-sm text-blue-700 dark:text-blue-300">{email}</p>
           </div>
         </div>
       </div>
@@ -137,19 +117,11 @@ export default function GooglePasswordSetup({
 
           <button
             type="button"
-            onClick={() =>
-              setShowPassword((previous) => !previous)
-            }
-            aria-label={
-              showPassword ? "Hide password" : "Show password"
-            }
+            onClick={() => setShowPassword((previous) => !previous)}
+            aria-label={showPassword ? "Hide password" : "Show password"}
             className="absolute right-1 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 hover:dark:text-slate-200"
           >
-            {showPassword ? (
-              <EyeOff size={18} />
-            ) : (
-              <Eye size={18} />
-            )}
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         </div>
       </div>
@@ -187,21 +159,11 @@ export default function GooglePasswordSetup({
 
           <button
             type="button"
-            onClick={() =>
-              setShowConfirmPassword((previous) => !previous)
-            }
-            aria-label={
-              showConfirmPassword
-                ? "Hide confirm password"
-                : "Show confirm password"
-            }
+            onClick={() => setShowConfirmPassword((previous) => !previous)}
+            aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
             className="absolute right-1 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 hover:dark:text-slate-200"
           >
-            {showConfirmPassword ? (
-              <EyeOff size={18} />
-            ) : (
-              <Eye size={18} />
-            )}
+            {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         </div>
       </div>
@@ -211,11 +173,7 @@ export default function GooglePasswordSetup({
           role="alert"
           className="flex items-start gap-2 rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/40 p-3 text-sm text-red-700 dark:text-red-300"
         >
-          <AlertCircle
-            size={18}
-            className="mt-0.5 shrink-0"
-            aria-hidden="true"
-          />
+          <AlertCircle size={18} className="mt-0.5 shrink-0" aria-hidden="true" />
           <span className="min-w-0 break-words">{error}</span>
         </div>
       )}
@@ -227,11 +185,7 @@ export default function GooglePasswordSetup({
       >
         {loading ? (
           <>
-            <LoaderCircle
-              size={18}
-              className="animate-spin"
-              aria-hidden="true"
-            />
+            <LoaderCircle size={18} className="animate-spin" aria-hidden="true" />
             Creating Account...
           </>
         ) : (
@@ -240,8 +194,8 @@ export default function GooglePasswordSetup({
       </button>
 
       <p className="text-center text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-        You can use either Google Sign-In or your password
-        to access your account after registration.
+        You can use either Google Sign-In or your password to access your account after
+        registration.
       </p>
     </form>
   );

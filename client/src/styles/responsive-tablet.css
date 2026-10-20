@@ -1,0 +1,238 @@
+@media (max-width: 1000px) {
+  .hero-art {
+    min-height: 450px;
+  }
+  .hero-copy h1 {
+    font-size: 4rem;
+  }
+  .hero-copy > p {
+    font-size: 1rem;
+  }
+  .art-label {
+    top: 60px;
+  }
+  .art-sun {
+    top: 100px;
+    width: 120px;
+    height: 120px;
+    left: calc(50% - 60px);
+  }
+  .art-building {
+    height: 190px;
+    bottom: 120px;
+    left: 8%;
+    right: 8%;
+  }
+  .building-arches {
+    gap: 13px;
+    padding: 40px 15px 0;
+  }
+  .art-caption {
+    bottom: 26px;
+    left: 25px;
+    right: 25px;
+  }
+  .floating-note {
+    bottom: 73px;
+    left: -25px;
+  }
+  .art-tree {
+    width: 58px;
+    height: 140px;
+  }
+  .tree-left {
+    left: -8px;
+  }
+  .tree-right {
+    right: -7px;
+  }
+  .hero-actions {
+    gap: 20px;
+  }
+  .hero-actions > .btn {
+    font-size: 0.9375rem;
+    padding: 14px 17px;
+  }
+  .hero-secondary {
+    font-size: 0.9375rem;
+  }
+  .landing-header nav > a:nth-child(2) {
+    display: none;
+  }
+  .feature-card {
+    padding: 27px 23px;
+  }
+  .feature-card h3 {
+    font-size: 1.45rem;
+  }
+  .feature-card p {
+    font-size: 1rem;
+  }
+  .workspace-section {
+    gap: 8%;
+  }
+  .workspace-section h2 {
+    font-size: 2.8rem;
+  }
+  .stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .stat-card strong {
+    font-size: 2.4rem;
+  }
+  .stat-card p {
+    font-size: 0.875rem;
+  }
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
+  .overview-aside {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+  }
+  .customer-note {
+    align-self: start;
+  }
+  .website-note h2 {
+    font-size: 2rem;
+  }
+  .hall-grid {
+    gap: 18px;
+  }
+  .hall-cover {
+    height: 180px;
+  }
+  .hall-body {
+    padding: 20px;
+  }
+  .hall-body .section-title {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .booking-details {
+    gap: 18px;
+    grid-template-columns: 1fr 1fr;
+  }
+  .booking-details > div:last-child {
+    grid-column: 1/-1;
+    border-top: 1px solid var(--line);
+    padding-top: 14px;
+    flex-direction: row;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  .booking-details > div:last-child > span {
+    width: 100%;
+    margin-bottom: 0;
+  }
+  .publication-panel {
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  .publication-panel > div {
+    min-width: 200px;
+  }
+  .subscription-banner {
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  .subscription-banner > div {
+    min-width: 200px;
+  }
+  .permission-grid {
+    grid-template-columns: 1fr;
+  }
+  .venue-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .auth-page {
+    grid-template-columns: 0.85fr 1.15fr;
+  }
+  .auth-story {
+    padding: 35px 30px;
+  }
+  .auth-story h2 {
+    font-size: 3rem;
+  }
+  .auth-main {
+    padding: 35px 9%;
+  }
+  .public-header .btn {
+    font-size: 0.9375rem;
+  }
+  .public-header nav {
+    font-size: 0.9375rem;
+    gap: 16px;
+  }
+  .venue-wordmark {
+    font-size: 1.45rem;
+  }
+  .public-hero {
+    min-height: 560px;
+  }
+  .public-hero h1 {
+    font-size: 5rem;
+  }
+  .public-intro {
+    padding: 75px 6%;
+    gap: 6%;
+  }
+  .public-intro h2 {
+    font-size: 2.8rem;
+  }
+  .public-intro > div > p {
+    font-size: 1rem;
+  }
+  .public-spaces,
+  .public-gallery-section {
+    padding: 65px 6%;
+  }
+  .public-section-heading h2 {
+    font-size: 2.5rem;
+  }
+  .public-hall-grid {
+    gap: 22px;
+  }
+  .public-hall-content {
+    padding: 23px;
+  }
+  .public-hall-content h3 {
+    font-size: 1.8rem;
+  }
+  .public-hall-image {
+    height: 230px;
+  }
+  .public-enquire {
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: 5%;
+  }
+  .public-enquire h2 {
+    font-size: 3rem;
+  }
+  .public-enquire > .enquiry-form {
+    padding: 23px;
+  }
+  .public-enquire .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .public-gallery > button {
+    height: 190px;
+  }
+  .public-contact {
+    padding: 65px 6%;
+    gap: 8%;
+  }
+  .public-contact h2 {
+    font-size: 2.5rem;
+  }
+  .image-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .override-row {
+    grid-template-columns: 1fr 1fr;
+  }
+  .override-row > .btn {
+    justify-self: end;
+  }
+}

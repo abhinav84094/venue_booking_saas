@@ -1,0 +1,129 @@
+.hall-subscription-body {
+  padding: 24px;
+}
+.hall-subscription-body h2 {
+  margin: 5px 0 12px;
+  font-size: 1.65rem;
+}
+.hall-subscription-body .venue-card-location {
+  padding: 0;
+  margin: 0 0 20px;
+}
+.subscription-validity {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 20px;
+  margin: 20px 0;
+}
+.subscription-validity div {
+  min-width: 0;
+}
+.subscription-validity dt {
+  color: var(--muted);
+  font-size: 0.875rem;
+  margin-bottom: 5px;
+}
+.subscription-validity dd {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.hall-subscription-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.hall-subscription-card .hall-subscription-actions {
+  flex-direction: column;
+}
+.hall-subscription-card .venue-card-art {
+  height: 165px;
+}
+.hall-subscription-card .venue-placeholder {
+  gap: 12px;
+}
+.venue-setup-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24px;
+}
+.venue-setup-summary h2 {
+  margin-bottom: 6px;
+}
+.venue-setup-summary p {
+  margin: 0;
+}
+.onboarding-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  margin-bottom: 35px;
+  border-bottom: 1px solid var(--border, var(--line));
+  padding-bottom: 20px;
+  font-size: 0.9375rem;
+}
+.onboarding-nav a {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.dashboard-validity {
+  margin-bottom: 28px;
+  background: var(--surface-subtle);
+  padding: 14px 18px;
+  border-radius: 12px;
+}
+.dashboard-validity summary {
+  cursor: pointer;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+.dashboard-validity p {
+  margin-bottom: 0;
+}
+.validity-compact {
+  grid-template-columns: repeat(4, 1fr);
+}
+.sidebar-subscription {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #dce7cd;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #475a37;
+}
+.sidebar-subscription span {
+  color: #b4c99d;
+}
+.sidebar-subscription a {
+  color: #dce7cd;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.badge-payment_pending {
+  color: var(--warning-text);
+  background: var(--warning-surface);
+}
+.badge-expired {
+  color: var(--danger-text);
+  background: var(--danger-surface);
+}
+@media (max-width: 760px) {
+  .validity-compact {
+    grid-template-columns: 1fr 1fr;
+  }
+  .hall-subscription-body {
+    padding: 20px;
+  }
+  .venue-setup-summary .hall-subscription-actions {
+    width: 100%;
+  }
+  .venue-setup-summary .btn {
+    flex: 1;
+  }
+}

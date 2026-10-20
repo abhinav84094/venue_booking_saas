@@ -1,20 +1,16 @@
-
 import { useEffect, useRef, useState } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import api from "../services/api";
 import { useTheme } from "../theme/useTheme";
 
-export default function GoogleAuthButton({
-  onLogin,
-  onPasswordRequired,
-}) {
+export default function GoogleAuthButton({ onLogin, onPasswordRequired }) {
   const containerRef = useRef(null);
   const [buttonWidth, setButtonWidth] = useState(240);
   const theme = useTheme();
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
-    const observer = new ResizeObserver(entries => {
+    const observer = new ResizeObserver((entries) => {
       const width = Math.floor(entries[0].contentRect.width);
       if (width > 0) setButtonWidth(Math.min(320, width));
     });
@@ -70,11 +66,7 @@ export default function GoogleAuthButton({
 
       await onLogin(data.user);
     } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          err.message ||
-          "Unable to sign in with Google."
-      );
+      setError(err.response?.data?.message || err.message || "Unable to sign in with Google.");
     } finally {
       setLoading(false);
     }
@@ -84,18 +76,13 @@ export default function GoogleAuthButton({
     <div className="w-full space-y-3">
       <div ref={containerRef} className="flex min-h-11 w-full min-w-0 items-center justify-center">
         {loading ? (
-          <p
-            role="status"
-            className="text-sm text-slate-500 dark:text-slate-400"
-          >
+          <p role="status" className="text-sm text-slate-500 dark:text-slate-400">
             Signing in with Google...
           </p>
         ) : (
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
-            onError={() =>
-              setError("Google sign-in failed. Please try again.")
-            }
+            onError={() => setError("Google sign-in failed. Please try again.")}
             theme={theme === "dark" ? "filled_black" : "outline"}
             size="large"
             shape="rectangular"

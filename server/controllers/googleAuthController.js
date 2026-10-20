@@ -1,237 +1,41 @@
-import { OAuth2Client } from "google-auth-library";
-import User from "../models/User.js";
-import generateToken from "../utils/generateToken.js";
+import {
+  authenticateGoogleAccount,
+  registerGoogleAccount,
+} from "../services/auth/googleAccountService.js";
+import { googleSignupSchema } from "../validators/authValidator.js";
+import { issueLogin } from "./authController.js";
 
-const googleClient = new OAuth2Client(
-  process.env.GOOGLE_CLIENT_ID
-);
-
-// Verify Google's ID token on the backend.
-const verifyGoogleToken = async (credential) => {
-  if (typeof credential !== "string" || !credential.trim()) {
-    throw new Error("Google credential is required");
-  }
-
-  const ticket = await googleClient.verifyIdToken({
-    idToken: credential,
-    audience: process.env.GOOGLE_CLIENT_ID,
-  });
-
-  const payload = ticket.getPayload();
-
-  if (
-    !payload?.sub ||
-    !payload?.email ||
-    payload.email_verified !== true
-  ) {
-    throw new Error("Invalid Google account");
-  }
-
-  const email = payload.email.trim().toLowerCase();
-  const domain = email.split("@")[1];
-
-  // Google is authoritative for Gmail and matching
-  // Google Workspace hosted domains.
-  const emailIsAuthoritative =
-    domain === "gmail.com" ||
-    domain === "googlemail.com" ||
-    (
-      typeof payload.hd === "string" &&
-      payload.hd.toLowerCase() === domain
-    );
-
-  return {
-    googleId: payload.sub,
-    email,
-    name: payload.name?.trim() || "Google User",
-    emailIsAuthoritative,
-  };
-};
-
-// Create session and return authenticated user.
-const issueLogin = (res, user) => {
-  const token = generateToken(
-    user._id,
-    user.tokenVersion
-  );
-
-  res.cookie("accessToken", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-    path: "/",
-  });
-
-  return res.status(200).json({
-    success: true,
-    requiresPassword: false,
-    user: {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      emailVerified: user.emailVerified,
-    },
-  });
-};
-
-// POST /api/auth/google
 export const googleLogin = async (req, res) => {
   try {
-    const googleUser = await verifyGoogleToken(
-      req.body?.credential
-    );
-
-    // Case 1: Google ID is already linked.
-    const linkedUser = await User.findOne({
-      googleId: googleUser.googleId,
-    });
-
-    if (linkedUser) {
-      if (linkedUser.email !== googleUser.email) {
-        return res.status(403).json({
-          success: false,
-          message: "Google account email mismatch",
-        });
-      }
-
-      if (!linkedUser.emailVerified) {
-        if (!googleUser.emailIsAuthoritative) {
-          return res.status(403).json({
-            success: false,
-            message: "Please verify your account email first",
-          });
-        }
-
-        linkedUser.emailVerified = true;
-        linkedUser.emailVerificationOtpHash = undefined;
-        linkedUser.emailVerificationExpiresAt = undefined;
-        linkedUser.emailVerificationLastSentAt = undefined;
-
-        await linkedUser.save();
-      }
-
-      return issueLogin(res, linkedUser);
-    }
-
-    // Case 2: Existing email/password account.
-    const existingUser = await User.findOne({
-      email: googleUser.email,
-    });
-
-    if (existingUser) {
-      if (existingUser.googleId) {
-        return res.status(409).json({
-          success: false,
-          message: "This email is linked to another Google account",
-        });
-      }
-
-      // Do not allow automatic account takeover
-      // through an arbitrary third-party email address.
-      if (!googleUser.emailIsAuthoritative) {
-        return res.status(403).json({
-          success: false,
-          message:
-            "For this email provider, please sign in with your existing password.",
-        });
-      }
-
-      // Google's verified identity is sufficient
-      // for authoritative Gmail / Workspace emails.
-      if (!existingUser.emailVerified) {
-        existingUser.emailVerified = true;
-        existingUser.emailVerificationOtpHash = undefined;
-        existingUser.emailVerificationExpiresAt = undefined;
-        existingUser.emailVerificationLastSentAt = undefined;
-
-        await existingUser.save();
-      }
-
-      // Preserve existing user ID, role and data.
-      return issueLogin(res, existingUser);
-    }
-
-    // Case 3: New Google user.
-    // Redirect to registration/password setup.
-    return res.status(200).json({
-      success: true,
-      requiresPassword: true,
-      message: "Set a password to complete registration",
-      name: googleUser.name,
-      email: googleUser.email,
-    });
+    const result = await authenticateGoogleAccount(req.body?.credential);
+    if (result.user) return issueLogin(res, result.user);
+    return res.json(result);
   } catch (error) {
-    console.error("Google login error:", error.message);
-
-    return res.status(401).json({
+    return res.status(error.statusCode || 401).json({
       success: false,
-      message: "Google authentication failed",
+      message: [403, 409, 503].includes(error.statusCode)
+        ? error.message
+        : "Google authentication failed",
     });
   }
 };
 
-// POST /api/auth/google/complete-signup
 export const completeGoogleSignup = async (req, res) => {
   try {
-    const {
-      credential,
-      password,
-      confirmPassword,
-    } = req.body ?? {};
-
-    if (
-      typeof password !== "string" ||
-      password.length < 8 ||
-      password !== confirmPassword
-    ) {
+    const input = googleSignupSchema.safeParse(req.body);
+    if (!input.success)
       return res.status(400).json({
         success: false,
-        message:
-          "Matching passwords of at least 8 characters are required",
+        message: "Matching passwords of at least 8 characters are required",
       });
-    }
-
-    const googleUser = await verifyGoogleToken(credential);
-
-    const existingUser = await User.findOne({
-      $or: [
-        { email: googleUser.email },
-        { googleId: googleUser.googleId },
-      ],
-    });
-
-    if (existingUser) {
-      return res.status(409).json({
-        success: false,
-        message: "Account already exists. Please sign in.",
-      });
-    }
-
-    const user = await User.create({
-      name: googleUser.name,
-      email: googleUser.email,
-      googleId: googleUser.googleId,
-      password,
-      emailVerified: true,
-      role: "owner",
-    });
-
+    const user = await registerGoogleAccount(input.data);
     return issueLogin(res, user);
   } catch (error) {
-    if (error.code === 11000) {
-      return res.status(409).json({
-        success: false,
-        message: "Account already exists",
-      });
-    }
-
-    console.error("Google signup error:", error.message);
-
-    return res.status(400).json({
+    if (error.code === 11000)
+      return res.status(409).json({ success: false, message: "Account already exists" });
+    return res.status(error.statusCode || 400).json({
       success: false,
-      message: "Unable to complete Google signup",
+      message: error.statusCode ? error.message : "Unable to complete Google signup",
     });
   }
 };

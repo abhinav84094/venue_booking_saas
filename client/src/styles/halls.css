@@ -1,0 +1,180 @@
+.hall-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+.hall-card {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.hall-cover {
+  height: 220px;
+  position: relative;
+  background: var(--surface-subtle);
+}
+.hall-cover > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.hall-cover > .badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+.hall-placeholder {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(145deg, var(--surface-subtle), var(--surface-selected));
+  color: var(--placeholder);
+}
+.hall-body {
+  padding: 24px;
+}
+.hall-body h2 {
+  font-size: 1.8rem;
+}
+.capacity {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 0.875rem;
+  flex-wrap: wrap;
+}
+.hall-description {
+  font-size: 1rem;
+  line-height: 1.8;
+}
+.facility-tags {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin: 15px 0;
+}
+.facility-tags > span {
+  font-size: 0.875rem;
+  padding: 5px 9px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  border-radius: 4px;
+}
+.hall-prices {
+  border-top: 1px solid var(--line);
+  padding-top: 15px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+.hall-prices > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  color: var(--muted);
+  font-size: 0.9375rem;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.hall-prices strong {
+  color: var(--ink);
+  font-weight: 550;
+  overflow-wrap: anywhere;
+}
+.hall-prices small {
+  font-weight: 400;
+  font-size: 0.875rem;
+}
+.rate-toggles {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+.rate-toggles .btn {
+  font-size: 0.9375rem;
+}
+.rate-editor {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 21px;
+  border-radius: 7px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.rate-editor > .section-title strong {
+  font-weight: 500;
+  color: var(--ink);
+}
+.rate-editor .form-grid {
+  gap: 15px;
+}
+.override-list {
+  border-top: 1px solid var(--line);
+  padding-top: 15px;
+}
+.override-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  align-items: end;
+  gap: 10px;
+  margin-top: 14px;
+}
+.override-list h4 {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+.image-edit {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  overflow: hidden;
+}
+.image-edit img {
+  height: 110px;
+  object-fit: cover;
+  width: 100%;
+}
+.image-edit > button {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+}
+.image-edit > input {
+  width: 100%;
+  padding: 9px;
+  border: 0;
+  border-top: 1px solid var(--line);
+  font-size: 1rem;
+  outline: none;
+}
+.upload-label {
+  cursor: pointer;
+}
+.upload-label input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.upload-label:focus-within {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}

@@ -1,0 +1,531 @@
+@media (max-width: 760px) {
+  .mobile-only {
+    display: inline-flex !important;
+  }
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.2s;
+    width: 255px;
+    padding: 25px 18px;
+  }
+  .sidebar-open {
+    transform: translateX(0);
+  }
+  .sidebar-scrim {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 49;
+    border: 0;
+    background: #0e231acc;
+    backdrop-filter: blur(2px);
+  }
+  .sidebar-scrim.visible {
+    display: block;
+  }
+  .sidebar-brand {
+    padding-bottom: 25px;
+  }
+  .sidebar nav > a {
+    font-size: 0.9375rem;
+    padding: 12px 14px;
+  }
+  .sidebar-section {
+    font-size: 0.875rem;
+  }
+  .sidebar-bottom > a {
+    font-size: 0.9375rem;
+  }
+  .venue-switch strong {
+    font-size: 0.9375rem;
+  }
+  .dashboard-main {
+    margin-left: 0;
+  }
+  .dashboard-topbar {
+    height: auto;
+    padding: 12px 22px;
+  }
+  .dashboard-topbar {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .dashboard-topbar > div:first-child {
+    width: 100%;
+    flex-basis: 100%;
+    align-items: flex-start;
+  }
+  .dashboard-topbar > div:last-child {
+    margin-left: auto;
+  }
+  .breadcrumb {
+    display: block;
+  }
+  .breadcrumb > span {
+    display: none;
+  }
+  .breadcrumb strong {
+    display: block;
+    max-width: none;
+    margin-top: 3px;
+  }
+
+  .dashboard-topbar > div {
+    gap: 10px;
+  }
+  .breadcrumb {
+    font-size: 0.9375rem;
+    gap: 10px;
+  }
+  .dashboard-content {
+    padding: 28px 22px;
+  }
+  .dashboard-footer {
+    padding: 20px 22px;
+  }
+  .page-heading {
+    gap: 18px;
+    align-items: flex-start;
+  }
+  .page-heading h1 {
+    font-size: 2.5rem;
+  }
+  .page-heading .eyebrow {
+    font-size: 0.875rem;
+  }
+  .page-heading > .btn {
+    min-height: 40px;
+    font-size: 0.9375rem;
+  }
+  .landing-header {
+    height: 83px;
+    padding: 0 6%;
+  }
+  .landing-header nav {
+    display: none;
+  }
+  .landing-header > .btn {
+    font-size: 0.9375rem;
+    padding: 10px 14px;
+  }
+  .landing-header .brand {
+    font-size: 1.45rem;
+  }
+  .landing-header .brand-mark {
+    width: 32px;
+    height: 35px;
+  }
+  .landing-hero {
+    grid-template-columns: 1fr;
+    padding: 40px 6% 55px;
+    gap: 45px;
+  }
+  .hero-copy h1 {
+    font-size: clamp(3.5rem, 10vw, 5rem);
+  }
+  .hero-copy > p {
+    font-size: 1rem;
+    max-width: 400px;
+  }
+  .hero-copy {
+    max-width: 530px;
+  }
+  .hero-kicker {
+    font-size: 0.875rem;
+    margin-bottom: 25px;
+  }
+  .hero-art {
+    width: 85%;
+    max-width: 480px;
+    min-height: 500px;
+    justify-self: center;
+  }
+  .art-sun {
+    top: 115px;
+    width: 140px;
+    height: 140px;
+    left: calc(50% - 70px);
+  }
+  .art-building {
+    height: 230px;
+    bottom: 130px;
+  }
+  .art-label {
+    top: 78px;
+  }
+  .art-tree {
+    height: 180px;
+    width: 75px;
+    bottom: 125px;
+  }
+  .floating-note {
+    left: -20px;
+    bottom: 80px;
+    padding: 16px;
+  }
+  .art-orbit {
+    right: -15px;
+  }
+  .art-caption {
+    left: 30px;
+    right: 30px;
+    bottom: 25px;
+  }
+  .hero-actions > .btn {
+    font-size: 0.9375rem;
+    padding: 15px 21px;
+  }
+  .hero-secondary {
+    font-size: 0.9375rem;
+  }
+  .venue-types {
+    flex-direction: column;
+    gap: 17px;
+    padding: 26px 6%;
+    text-align: center;
+  }
+  .venue-types > span {
+    max-width: 100%;
+    font-size: 0.875rem;
+  }
+  .venue-types p {
+    font-size: 1.1rem;
+    line-height: 2;
+  }
+  .venue-types p span {
+    margin: 0 11px;
+  }
+  .experience-section {
+    padding: 60px 6%;
+  }
+  .section-heading h2 {
+    font-size: 2.6rem;
+  }
+  .feature-grid {
+    grid-template-columns: 1fr;
+    gap: 17px;
+  }
+  .feature-card {
+    padding: 25px 28px;
+  }
+  .feature-card > div {
+    margin-bottom: 22px;
+  }
+  .feature-card h3 {
+    font-size: 1.9rem;
+  }
+  .feature-card p {
+    font-size: 1rem;
+    max-width: 500px;
+    margin-bottom: 25px;
+  }
+  .feature-foot {
+    font-size: 0.875rem;
+  }
+  .workspace-section {
+    grid-template-columns: 1fr;
+    padding: 55px 6%;
+    gap: 30px;
+  }
+  .workspace-section > div {
+    max-width: none;
+  }
+  .workspace-section > div:first-child {
+    margin: 0;
+  }
+  .workspace-section h2 {
+    font-size: 2.9rem;
+  }
+  .workspace-section p:not(.eyebrow) {
+    font-size: 1rem;
+    max-width: 500px;
+  }
+  .workspace-list > div {
+    padding: 20px 0;
+  }
+  .workspace-list h3 {
+    font-size: 1rem;
+  }
+  .landing-cta {
+    padding: 65px 6%;
+  }
+  .landing-cta h2 {
+    font-size: 3.8rem;
+  }
+  .landing-footer {
+    flex-wrap: wrap;
+    padding: 28px 6%;
+    gap: 25px;
+  }
+  .landing-footer > span {
+    order: 3;
+    width: 100%;
+    font-size: 0.875rem;
+  }
+  .landing-footer > a:last-child {
+    margin-left: auto;
+    font-size: 0.875rem;
+  }
+  .auth-page {
+    grid-template-columns: 1fr;
+  }
+  .auth-story {
+    display: none;
+  }
+  .auth-main {
+    min-height: 100dvh;
+    padding: 25px 8%;
+  }
+  .auth-mobile-brand {
+    display: block;
+    margin-bottom: 25px;
+  }
+  .auth-main > .back-link {
+    display: none;
+  }
+  .auth-form-wrap {
+    margin: 35px auto 50px;
+    max-width: 400px;
+  }
+  .auth-form-wrap h1 {
+    font-size: 2.9rem;
+  }
+  .workspace-header {
+    padding: 20px 5%;
+  }
+  .workspace-header .brand {
+    font-size: 1.4rem;
+  }
+  .workspace-header > div {
+    gap: 10px;
+  }
+  .workspace-header > div > .muted {
+    display: none;
+  }
+  .workspace-header .btn {
+    font-size: 0.9375rem;
+  }
+  .venues-main,
+  .admin-main {
+    padding: 35px 5%;
+  }
+  .venues-main > .page-heading {
+    flex-wrap: wrap;
+  }
+  .venues-main > .page-heading h1 {
+    font-size: 2.8rem;
+  }
+  .venue-card-art {
+    height: 200px;
+  }
+  .create-main {
+    padding: 35px 5% 60px;
+  }
+  .venue-grid {
+    gap: 18px;
+  }
+  .venue-card-body {
+    padding: 20px 17px 8px;
+  }
+  .venue-card-body h2 {
+    font-size: 1.6rem;
+  }
+  .venue-card-location {
+    padding-left: 17px;
+    padding-right: 17px;
+    font-size: 0.875rem;
+  }
+  .public-header {
+    min-height: 85px;
+    height: auto;
+    padding: 16px 6%;
+    gap: 15px;
+  }
+  .public-header nav {
+    display: none;
+  }
+  .public-header > .btn {
+    font-size: 0.9375rem;
+    padding: 11px 13px;
+  }
+  .public-header .venue-wordmark {
+    font-size: 1.4rem;
+    max-width: 55%;
+  }
+  .public-hero {
+    min-height: 590px;
+  }
+  .public-hero-content {
+    padding: 70px 7% 110px;
+  }
+  .public-hero h1 {
+    font-size: clamp(3.2rem, 8vw, 4.5rem);
+    max-width: 600px;
+  }
+  .public-hero-content > p:not(.eyebrow) {
+    font-size: 1rem;
+    max-width: 400px;
+  }
+  .public-hero .eyebrow {
+    font-size: 0.875rem;
+    margin-bottom: 24px;
+  }
+  .public-hero-footer {
+    left: 7%;
+    right: 7%;
+    font-size: 0.875rem;
+  }
+  .public-hero-arch {
+    width: 55%;
+    right: -5%;
+    height: 80%;
+  }
+  .public-intro {
+    grid-template-columns: 1fr;
+    padding: 65px 7%;
+    gap: 14px;
+  }
+  .public-intro > .eyebrow {
+    margin-bottom: 8px;
+  }
+  .public-intro h2 {
+    font-size: 3rem;
+    margin-bottom: 15px;
+  }
+  .public-intro > div > p {
+    font-size: 1rem;
+  }
+  .public-facilities {
+    padding-top: 10px;
+    gap: 14px 22px;
+  }
+  .public-section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+  }
+  .public-section-heading h2 {
+    font-size: 2.8rem;
+  }
+  .public-section-heading > p {
+    font-size: 0.875rem;
+  }
+  .public-spaces,
+  .public-gallery-section {
+    padding: 55px 7%;
+  }
+  .public-hall-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  .public-hall-image {
+    height: 320px;
+  }
+  .public-hall-content {
+    padding: 27px;
+  }
+  .public-hall-content h3 {
+    font-size: 2.3rem;
+  }
+  .public-hall-content > div:first-child > span {
+    font-size: 0.875rem;
+  }
+  .public-hall-content > p {
+    font-size: 1rem;
+  }
+  .public-hall-content .small {
+    font-size: 0.875rem;
+  }
+  .public-rate-list {
+    font-size: 0.875rem;
+  }
+  .public-hall-action {
+    font-size: 0.9375rem;
+  }
+  .public-gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .public-gallery > button {
+    height: 210px;
+  }
+  .public-extras {
+    padding: 0 7% 45px;
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+  .public-extras h3 {
+    margin: 12px 0;
+    font-size: 1.7rem;
+  }
+  .public-extras p {
+    font-size: 1rem;
+  }
+  .public-enquire {
+    grid-template-columns: 1fr;
+    padding: 60px 7%;
+    gap: 35px;
+  }
+  .public-enquire > div {
+    position: static;
+  }
+  .public-enquire h2 {
+    font-size: 3.7rem;
+    margin: 15px 0 23px;
+  }
+  .public-enquire > div > p:not(.eyebrow) {
+    max-width: 450px;
+  }
+  .enquiry-contact {
+    margin: 25px 0;
+  }
+  .public-enquire > .enquiry-form {
+    padding: 28px;
+    gap: 22px;
+  }
+  .public-enquire .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .public-venue .field > label {
+    font-size: 0.9375rem;
+  }
+  .public-venue .field input,
+  .public-venue .field select,
+  .public-venue .field textarea {
+    font-size: 1rem;
+  }
+  .public-venue .small {
+    font-size: 0.875rem;
+  }
+  .public-contact {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding: 55px 7%;
+  }
+  .public-contact h2 {
+    font-size: 2.8rem;
+  }
+  .public-policies {
+    padding: 55px 7%;
+  }
+  .public-footer {
+    padding: 30px 7%;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .public-footer > span:not(.venue-wordmark) {
+    order: 3;
+    width: 100%;
+  }
+  .public-footer > a {
+    margin-left: auto;
+  }
+  .public-footer .venue-wordmark {
+    font-size: 1.4rem;
+  }
+  .public-editorial .public-hero {
+    min-height: 630px;
+  }
+}

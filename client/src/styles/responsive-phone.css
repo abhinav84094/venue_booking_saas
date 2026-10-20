@@ -1,0 +1,747 @@
+@media (max-width: 480px) {
+  :root {
+    font-size: 16px;
+  }
+  .landing-header {
+    padding: 0 5%;
+    gap: 12px;
+  }
+  .landing-header > .btn {
+    font-size: 0.9375rem;
+    min-height: 39px;
+    padding: 10px;
+  }
+  .landing-header .brand {
+    font-size: 1.3rem;
+  }
+  .landing-header .brand-sub {
+    font-size: 0.875rem;
+  }
+  .hero-copy h1 {
+    font-size: 3.35rem;
+  }
+  .hero-copy > p {
+    font-size: 1rem;
+    max-width: 320px;
+  }
+  .hero-kicker {
+    font-size: 0.875rem;
+  }
+  .hero-actions {
+    gap: 20px;
+  }
+  .hero-actions .btn {
+    min-height: 48px;
+    font-size: 0.9375rem;
+    padding: 14px 18px;
+  }
+  .hero-secondary {
+    font-size: 0.9375rem;
+  }
+  .hero-note {
+    font-size: 0.875rem;
+  }
+  .hero-art {
+    width: 90%;
+    min-height: 415px;
+  }
+  .art-building {
+    height: 185px;
+    bottom: 115px;
+    left: 8%;
+    right: 8%;
+  }
+  .art-label {
+    top: 62px;
+    font-size: 0.875rem;
+  }
+  .art-sun {
+    top: 95px;
+    width: 110px;
+    height: 110px;
+    left: calc(50% - 55px);
+  }
+  .building-arches {
+    padding: 35px 12px 0;
+    gap: 12px;
+  }
+  .building-arch {
+    padding: 6px 6px 0;
+  }
+  .art-tree {
+    height: 140px;
+    width: 55px;
+    bottom: 107px;
+  }
+  .tree-left {
+    left: -12px;
+  }
+  .tree-right {
+    right: -12px;
+  }
+  .floating-note {
+    left: -12px;
+    bottom: 78px;
+    padding: 12px 14px;
+    gap: 9px;
+  }
+  .floating-note strong {
+    font-size: 0.875rem;
+  }
+  .floating-note div > span {
+    font-size: 0.875rem;
+  }
+  .floating-icon {
+    height: 34px;
+    width: 34px;
+  }
+  .art-caption {
+    left: 23px;
+    right: 23px;
+    bottom: 23px;
+    padding-top: 15px;
+    gap: 8px;
+  }
+  .art-caption > span:first-child {
+    font-size: 0.875rem;
+  }
+  .art-caption > span:last-child {
+    font-size: 0.94rem;
+  }
+  .art-orbit {
+    font-size: 0.875rem;
+    right: -13px;
+  }
+  .venue-types p {
+    font-size: 0.95rem;
+  }
+  .venue-types p span {
+    margin: 0 7px;
+    font-size: 0.875rem;
+  }
+  .section-heading .eyebrow {
+    font-size: 0.875rem;
+  }
+  .section-heading h2 {
+    font-size: 2.35rem;
+  }
+  .feature-card {
+    padding: 24px;
+  }
+  .workspace-section h2 {
+    font-size: 2.65rem;
+  }
+  .workspace-list h3 {
+    font-size: 1rem;
+  }
+  .landing-cta h2 {
+    font-size: 3.35rem;
+  }
+  .landing-cta .eyebrow {
+    font-size: 0.875rem;
+  }
+  .dashboard-content {
+    padding: 25px 17px;
+  }
+  .dashboard-topbar {
+    padding: 12px 14px;
+    height: auto;
+  }
+  .breadcrumb {
+    font-size: 0.9375rem;
+    gap: 8px;
+  }
+  .breadcrumb > strong {
+    max-width: none;
+  }
+  .dashboard-topbar > div {
+    gap: 10px;
+  }
+  .dashboard-topbar .badge {
+    font-size: 0.875rem;
+    padding: 5px 7px;
+  }
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 0.875rem;
+  }
+  .dashboard-topbar .icon-btn {
+    width: 40px;
+    height: 40px;
+  }
+  .page-heading {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 17px;
+    margin-bottom: 26px;
+  }
+  .page-heading h1 {
+    font-size: 2.6rem;
+  }
+  .page-heading .eyebrow {
+    font-size: 0.875rem;
+  }
+  .page-heading .muted {
+    font-size: 1rem;
+  }
+  .page-heading > .btn {
+    font-size: 0.9375rem;
+    min-height: 41px;
+  }
+  .stat-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+    gap: 11px;
+    margin-bottom: 22px;
+  }
+  .stat-card {
+    padding: 18px 15px;
+  }
+  .stat-card > div > span,
+  .stat-card > span {
+    font-size: 0.875rem;
+  }
+  .stat-card > div svg {
+    width: 15px;
+  }
+  .stat-card strong {
+    font-size: clamp(1.5rem, 7vw, 1.75rem);
+    margin-top: 23px;
+  }
+  .stat-card:has(a[href$="/payments"]) {
+    grid-column: 1 / -1;
+  }
+  .stat-card p {
+    font-size: 0.875rem;
+    max-width: none;
+    line-height: 1.6;
+  }
+  .stat-card > a {
+    bottom: 15px;
+    right: 13px;
+  }
+  .panel {
+    padding: 22px 18px;
+    border-radius: 7px;
+    margin-bottom: 21px;
+  }
+  .panel .section-title h2 {
+    font-size: 1.7rem;
+  }
+  .overview-aside {
+    grid-template-columns: 1fr;
+  }
+  .overview-grid {
+    gap: 22px;
+  }
+  .event-list article {
+    gap: 13px;
+  }
+  .event-list strong {
+    font-size: 0.9375rem;
+  }
+  .event-list p {
+    font-size: 0.875rem;
+  }
+  .event-list div > span {
+    font-size: 0.875rem;
+  }
+  .event-date {
+    width: 36px;
+    height: 43px;
+  }
+  .event-amount {
+    font-size: 0.9375rem;
+  }
+  .overview-grid .text-link {
+    font-size: 0.875rem;
+    gap: 4px;
+  }
+  .website-note {
+    padding: 25px;
+  }
+  .customer-note {
+    padding: 24px;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 19px;
+  }
+  .field input,
+  .field select,
+  .field textarea {
+    font-size: 16px;
+    min-height: 46px;
+  }
+  .field > label {
+    font-size: 0.9375rem;
+  }
+  .form-footer {
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .form-footer > .btn {
+    min-height: 45px;
+  }
+  .form-footer p {
+    font-size: 0.875rem;
+  }
+  .inline-fields {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 13px;
+  }
+  .inline-fields .btn {
+    align-self: flex-start;
+  }
+  .hall-grid {
+    grid-template-columns: 1fr;
+  }
+  .hall-cover {
+    height: 210px;
+  }
+  .hall-body {
+    padding: 24px;
+  }
+  .hall-body .section-title {
+    flex-wrap: wrap;
+  }
+  .hall-body h2 {
+    font-size: 2rem;
+  }
+  .hall-description {
+    font-size: 1rem;
+  }
+  .hall-prices > div {
+    font-size: 0.9375rem;
+  }
+  .rate-editor {
+    padding: 18px 14px;
+  }
+  .rate-editor .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .rate-toggles {
+    gap: 8px;
+  }
+  .rate-toggles .btn {
+    font-size: 0.9375rem;
+    min-height: 39px;
+    padding: 10px 12px;
+  }
+  .override-row {
+    grid-template-columns: 1fr;
+  }
+  .override-list > .section-title {
+    flex-wrap: wrap;
+  }
+  .image-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+  .image-edit img {
+    height: 110px;
+  }
+  .image-manager > .section-title {
+    flex-wrap: wrap;
+  }
+  .image-manager .btn {
+    font-size: 0.9375rem;
+  }
+  .toolbar {
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 18px;
+  }
+  .toolbar > .field {
+    min-width: 0;
+    flex: 1;
+    max-width: none;
+  }
+  .toolbar p {
+    font-size: 0.875rem;
+  }
+  .booking-details {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .booking-details > div {
+    gap: 7px;
+  }
+  .booking-details > div:last-child {
+    grid-column: auto;
+    gap: 10px;
+  }
+  .booking-details strong {
+    font-size: 0.9375rem;
+  }
+  .booking-details p,
+  .booking-details a {
+    font-size: 0.875rem;
+  }
+  .booking-card .section-title {
+    margin-bottom: 22px;
+  }
+  .booking-card h2 {
+    font-size: 1.9rem;
+  }
+  .booking-card .eyebrow {
+    font-size: 0.875rem;
+    overflow-wrap: anywhere;
+  }
+  .booking-actions {
+    gap: 8px;
+  }
+  .booking-actions .btn {
+    font-size: 0.9375rem;
+    min-height: 41px;
+  }
+  .calendar-panel {
+    padding: 15px 10px;
+  }
+  .calendar-day,
+  .calendar-pad {
+    height: 80px;
+    padding: 6px 4px;
+    font-size: 0.875rem;
+  }
+  .calendar-event,
+  .calendar-block {
+    font-size: 0.875rem;
+    padding: 3px 2px;
+  }
+  .calendar-legend {
+    width: 100%;
+    padding-bottom: 0;
+  }
+  .calendar-panel > .section-title {
+    padding: 5px 6px 15px;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .calendar-panel > .section-title h2 {
+    font-size: 1.55rem;
+  }
+  .calendar-panel > .section-title .small {
+    font-size: 0.875rem;
+    max-width: none;
+    line-height: 1.6;
+  }
+  .calendar-weekday {
+    font-size: 0.875rem;
+  }
+  .calendar-panel .loading {
+    font-size: 0.875rem;
+    min-height: 100px;
+    padding: 20px;
+  }
+  .calendar-details h2 {
+    font-size: 1.7rem;
+  }
+  .availability-row p {
+    font-size: 1rem;
+  }
+  .publication-panel {
+    padding: 22px 18px;
+    gap: 17px;
+  }
+  .publication-panel > div {
+    min-width: 190px;
+  }
+  .publication-panel > .btn {
+    width: 100%;
+  }
+  .publication-panel > .badge {
+    margin-left: auto;
+  }
+  .publication-icon {
+    height: 40px;
+    width: 40px;
+  }
+  .subscription-banner {
+    padding: 24px 18px;
+    gap: 17px;
+  }
+  .subscription-banner > div {
+    min-width: 180px;
+  }
+  .subscription-banner h2 {
+    font-size: 1.8rem;
+  }
+  .subscription-banner > .badge {
+    margin-left: auto;
+  }
+  .subscription-banner > .btn {
+    font-size: 0.9375rem;
+  }
+  .plan-grid {
+    grid-template-columns: 1fr;
+  }
+  .plan-card {
+    padding: 26px;
+  }
+  .staff-row {
+    flex-wrap: wrap;
+    gap: 13px;
+  }
+  .staff-row > div {
+    width: 100%;
+    flex: auto;
+  }
+  .staff-row p {
+    overflow-wrap: anywhere;
+  }
+  .permission-grid label {
+    font-size: 0.875rem;
+  }
+  .dashboard-footer {
+    font-size: 0.875rem;
+    padding: 19px 17px;
+    gap: 15px;
+  }
+  .venues-main,
+  .admin-main {
+    padding-top: 30px;
+  }
+  .venues-main > .page-heading h1 {
+    font-size: 2.8rem;
+  }
+  .venue-grid {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+  .venue-card-art {
+    height: 230px;
+  }
+  .venue-card-body h2 {
+    font-size: 2rem;
+  }
+  .venue-card-body {
+    padding: 24px 22px 10px;
+  }
+  .venue-card-location {
+    padding-left: 22px;
+    padding-right: 22px;
+    font-size: 0.875rem;
+  }
+  .workspace-home-note {
+    padding-top: 40px;
+  }
+  .workspace-header {
+    padding: 20px 5%;
+    gap: 15px;
+  }
+  .workspace-header .brand {
+    font-size: 1.3rem;
+  }
+  .workspace-header .brand-mark {
+    width: 31px;
+    height: 35px;
+  }
+  .workspace-header > div {
+    gap: 4px;
+  }
+  .workspace-header > div > .btn {
+    font-size: 0.9375rem;
+    padding: 8px;
+  }
+  .workspace-header > div > a:not(.btn) {
+    font-size: 0.9375rem;
+  }
+  .workspace-header > .text-link {
+    font-size: 0.9375rem;
+  }
+  .workspace-header > .btn {
+    font-size: 0.9375rem;
+    padding: 10px;
+  }
+  .auth-main {
+    padding: 25px 7%;
+  }
+  .auth-form-wrap {
+    margin-top: 35px;
+  }
+  .auth-form-wrap h1 {
+    font-size: 2.8rem;
+  }
+  .auth-form-wrap > .muted {
+    font-size: 1rem;
+  }
+  .auth-form-wrap .field {
+    gap: 8px;
+  }
+  .auth-form-wrap .btn {
+    min-height: 48px;
+  }
+  .auth-form-wrap .form-stack {
+    gap: 22px;
+  }
+  .public-header {
+    min-height: 78px;
+    height: auto;
+    padding: 16px 5%;
+    gap: 13px;
+  }
+  .public-header .venue-wordmark {
+    font-size: 1.25rem;
+  }
+  .public-header .venue-wordmark > span {
+    font-size: 0.875rem;
+    letter-spacing: 0.18em;
+  }
+  .public-header > .btn {
+    font-size: 0.9375rem;
+    gap: 7px;
+    min-height: 39px;
+    padding: 10px;
+  }
+  .public-header > .btn > svg {
+    width: 13px;
+  }
+  .public-hero {
+    min-height: 570px;
+  }
+  .public-hero-content {
+    padding: 70px 6% 110px;
+  }
+  .public-hero h1 {
+    font-size: 3.2rem;
+    line-height: 1.07;
+  }
+  .public-hero .eyebrow {
+    font-size: 0.875rem;
+    letter-spacing: 0.1em;
+  }
+  .public-hero-content > p:not(.eyebrow) {
+    font-size: 1rem;
+    line-height: 1.85;
+  }
+  .public-hero-footer {
+    font-size: 0.875rem;
+    gap: 25px;
+  }
+  .public-intro {
+    padding: 55px 6%;
+  }
+  .public-intro h2 {
+    font-size: 2.9rem;
+  }
+  .public-intro > div > p {
+    font-size: 1rem;
+  }
+  .public-spaces,
+  .public-gallery-section {
+    padding: 50px 6%;
+  }
+  .public-section-heading h2 {
+    font-size: 2.7rem;
+  }
+  .public-section-heading .eyebrow {
+    font-size: 0.875rem;
+  }
+  .public-hall-image {
+    height: 260px;
+  }
+  .public-hall-content {
+    padding: 25px 22px;
+  }
+  .public-hall-content h3 {
+    font-size: 2.1rem;
+  }
+  .public-hall-content > div:first-child > span {
+    font-size: 0.875rem;
+  }
+  .public-hall-content > p {
+    font-size: 1rem;
+  }
+  .public-hall-action {
+    font-size: 0.9375rem;
+  }
+  .public-gallery {
+    gap: 10px;
+  }
+  .public-gallery > button {
+    height: 170px;
+  }
+  .public-extras {
+    padding: 0 6% 45px;
+    gap: 25px;
+  }
+  .public-enquire {
+    padding: 55px 6%;
+    gap: 30px;
+  }
+  .public-enquire h2 {
+    font-size: 3.3rem;
+  }
+  .public-enquire > .enquiry-form {
+    padding: 24px 18px;
+    gap: 21px;
+  }
+  .public-enquire .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .enquiry-form > .btn {
+    font-size: 0.9375rem;
+    min-height: 46px;
+  }
+  .public-venue .field > label {
+    font-size: 0.9375rem;
+  }
+  .public-venue .small {
+    font-size: 0.875rem;
+  }
+  .public-enquire > div > p:not(.eyebrow) {
+    font-size: 1rem;
+  }
+  .enquiry-contact {
+    gap: 20px;
+  }
+  .enquiry-contact a {
+    font-size: 0.9375rem;
+  }
+  .quote-result {
+    padding: 18px;
+  }
+  .quote-result strong {
+    font-size: 1.8rem;
+  }
+  .public-contact {
+    padding: 50px 6%;
+    gap: 35px;
+  }
+  .public-contact h2 {
+    font-size: 2.6rem;
+  }
+  .public-contact p {
+    font-size: 1rem;
+    line-height: 1.9;
+  }
+  .public-policies {
+    padding: 50px 6%;
+  }
+  .public-footer {
+    padding: 30px 6%;
+    gap: 20px;
+  }
+  .public-footer .venue-wordmark {
+    font-size: 1.2rem;
+  }
+  .public-footer > a {
+    font-size: 0.875rem;
+  }
+  .public-footer > span:not(.venue-wordmark) {
+    font-size: 0.875rem;
+  }
+  .photo-close {
+    right: 13px;
+    top: 13px;
+  }
+  .photo-dialog {
+    max-width: 96vw;
+    padding: 5px;
+  }
+  .public-editorial .public-hero h1 {
+    font-size: 3.1rem;
+  }
+}
