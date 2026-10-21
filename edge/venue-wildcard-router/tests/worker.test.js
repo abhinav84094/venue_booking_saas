@@ -423,6 +423,53 @@ for (const [method, path, body, status] of publicRoutes) {
   });
 }
 
+test("royalpalace quote POST reaches Render validation and preserves its 400 JSON response", async () => {
+  const quotePath =
+    "/api/public/venues/royalpalace/halls/6ad7b95579088a82b30a04da/quote";
+  const validation = {
+    success: false,
+    message: "Check the highlighted fields",
+    errors: ["startAt", "endAt", "model"].map((path) => ({ path, message: "Required" })),
+  };
+  const payload = JSON.stringify(validation);
+  const app = harness((request, call) => {
+    assert.equal(call.url.origin, BACKEND, "the quote must reach Render, never Netlify");
+    assert.equal(call.url.pathname, quotePath);
+    assert.equal(request.method, "POST");
+    assert.equal(call.body, "{}", "forward the original body without adding or removing fields");
+    assert.equal(request.headers.get("content-type"), "application/json");
+    assert.equal(request.headers.get("cookie"), null);
+    assert.equal(request.headers.get("authorization"), null);
+    return new Response(payload, {
+      status: 400,
+      headers: { "Content-Type": "application/json; charset=utf-8" },
+    });
+  });
+
+  // Cover the exact production URL, then the same route with an encoded query.
+  for (const query of ["", "?trace=quote%2Bvalidation&source=public"]) {
+    const before = app.calls.length;
+    const response = await app.fetch(
+      `${quotePath}${query}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: "venueSession=private",
+          Authorization: "Bearer private",
+        },
+        body: "{}",
+      },
+      "royalpalace",
+    );
+    assert.equal(response.status, 400, "backend validation must not become an edge 405");
+    assert.equal(response.headers.get("content-type"), "application/json; charset=utf-8");
+    assert.equal(await response.text(), payload);
+    assert.equal(app.calls.length, before + 1, "only the public Render API is fetched");
+    assert.equal(app.calls.at(-1).url.search, query);
+  }
+});
+
 test("receipt status remains reachable after venue unpublication through its existing capability API", async () => {
   const app = harness((request) => {
     assert.match(new URL(request.url).pathname, /\/enquiries\/status$/);

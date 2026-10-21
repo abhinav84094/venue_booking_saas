@@ -7,12 +7,17 @@ import {
   Globe2,
   Check,
   MoveUpRight,
+  Phone,
+  Mail,
 } from "lucide-react";
 import { Brand } from "../components/ui";
 import { useAuth } from "../context/authContext";
 import { platformCopy } from "../../../shared/platformSeo.js";
 export default function LandingPage() {
   const { isAuthenticated } = useAuth();
+  const supportPhone = import.meta.env.VITE_CONTACT_PHONE?.trim();
+  const supportEmail = import.meta.env.VITE_CONTACT_EMAIL?.trim();
+  const hasSupportContact = Boolean(supportPhone || supportEmail);
   return (
     <div className="landing">
       <header className="landing-header">
@@ -20,6 +25,7 @@ export default function LandingPage() {
         <nav aria-label="Main navigation">
           <a href="#experience">The experience</a>
           <a href="#workspace">Your workspace</a>
+          {hasSupportContact && <a href="#support">Contact support</a>}
           <Link to={isAuthenticated ? "/venues" : "/login"}>
             Sign in <ArrowUpRight size={14} />
           </Link>
@@ -57,6 +63,11 @@ export default function LandingPage() {
               </span>
               Built for independent venues. No coding needed.
             </div>
+            {hasSupportContact && (
+              <p className="hero-support">
+                Need help getting started? <a href="#support">Contact support</a>
+              </p>
+            )}
           </div>
           <div
             className="hero-art"
@@ -162,6 +173,36 @@ export default function LandingPage() {
             ))}
           </div>
         </section>
+        {hasSupportContact && (
+          <section className="landing-support" id="support" aria-labelledby="support-heading">
+            <div>
+              <p className="eyebrow">WE'RE HERE TO HELP</p>
+              <h2 id="support-heading">A little help getting started.</h2>
+              <p>
+                Stuck setting up your venue? Contact us for help with your account, venue details,
+                halls or subscriptions.
+              </p>
+            </div>
+            <div className="landing-support-contact">
+              {supportPhone && (
+                <a
+                  className="btn btn-primary"
+                  href={`tel:${supportPhone.replace(/[^+\d]/g, "")}`}
+                  aria-label={`Call support at ${supportPhone}`}
+                >
+                  <Phone size={18} aria-hidden="true" />
+                  {supportPhone}
+                </a>
+              )}
+              {supportEmail && (
+                <a className="support-email" href={`mailto:${supportEmail}`}>
+                  <Mail size={18} aria-hidden="true" />
+                  <span>{supportEmail}</span>
+                </a>
+              )}
+            </div>
+          </section>
+        )}
         <section className="landing-cta" aria-labelledby="start-heading">
           <p className="eyebrow">YOUR NEXT CHAPTER STARTS HERE</p>
           <h2 id="start-heading">
@@ -177,9 +218,12 @@ export default function LandingPage() {
       <footer className="landing-footer">
         <Brand />
         <span>© {new Date().getFullYear()} Prakash SaaS. Made for meaningful gatherings.</span>
-        <Link to="/login">
-          Owner sign in <ArrowUpRight size={14} />
-        </Link>
+        <nav aria-label="Footer navigation">
+          {hasSupportContact && <a href="#support">Contact support</a>}
+          <Link to="/login">
+            Owner sign in <ArrowUpRight size={14} />
+          </Link>
+        </nav>
       </footer>
     </div>
   );

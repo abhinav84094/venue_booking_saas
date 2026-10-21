@@ -250,6 +250,12 @@
   .landing-cta {
     padding: 65px 6%;
   }
+  .landing-support {
+    padding: 55px 6%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 28px;
+  }
   .landing-cta h2 {
     font-size: 3.8rem;
   }
@@ -263,7 +269,7 @@
     width: 100%;
     font-size: 0.875rem;
   }
-  .landing-footer > a:last-child {
+  .landing-footer > nav {
     margin-left: auto;
     font-size: 0.875rem;
   }

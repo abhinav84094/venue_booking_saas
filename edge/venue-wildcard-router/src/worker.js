@@ -261,12 +261,20 @@ export function createWorker({ fetch: fetchUpstream = globalThis.fetch, timeoutM
         }
         if (robots || sitemap) {
           const body = robots
-            ? `User-agent: *\nAllow: /$\nDisallow: /api/\nSitemap: ${canonical}sitemap.xml\n`
+            ? `User-agent: *
+        Allow: /$
+        Allow: /api/public/venues/
+        Disallow: /api/
+        Sitemap: ${canonical}sitemap.xml
+        `
             : `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${escapeHtml(canonical)}</loc></url></urlset>`;
+
           return new Response(method === "HEAD" ? null : body, {
             status: 200,
             headers: responseHeaders(
-              robots ? "text/plain; charset=utf-8" : "application/xml; charset=utf-8",
+              robots
+                ? "text/plain; charset=utf-8"
+                : "application/xml; charset=utf-8",
             ),
           });
         }

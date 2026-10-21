@@ -59,6 +59,9 @@
   .landing-header nav > a:nth-child(2) {
     display: none;
   }
+  .landing-header nav {
+    gap: 14px;
+  }
   .feature-card {
     padding: 27px 23px;
   }

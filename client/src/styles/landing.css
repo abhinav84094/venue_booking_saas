@@ -91,6 +91,15 @@
   font-size: 0.875rem;
   margin-top: 26px;
 }
+.hero-copy > .hero-support {
+  margin: 14px 0 0;
+  font-size: 0.875rem;
+}
+.hero-support a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 .mini-icon {
   height: 20px;
   width: 20px;
@@ -424,6 +433,46 @@
 .workspace-list svg {
   color: var(--muted);
 }
+.landing-support {
+  max-width: 1390px;
+  margin: auto;
+  padding: 76px 5%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  scroll-margin-top: 24px;
+}
+.landing-support > div:first-child {
+  max-width: 520px;
+}
+.landing-support h2 {
+  font-size: clamp(2rem, 3vw, 3rem);
+  margin-bottom: 18px;
+}
+.landing-support p:not(.eyebrow) {
+  color: var(--muted);
+  margin: 0;
+}
+.landing-support-contact {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+  min-width: 0;
+}
+.support-email {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9375rem;
+}
+.support-email svg {
+  flex-shrink: 0;
+}
+.support-email span {
+  overflow-wrap: anywhere;
+}
 .landing-cta {
   padding: 90px 5%;
   text-align: center;
@@ -454,7 +503,12 @@
   font-size: 0.875rem;
   color: var(--muted);
 }
-.landing-footer > a:last-child {
+.landing-footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+}
+.landing-footer nav a {
   display: flex;
   align-items: center;
   gap: 7px;

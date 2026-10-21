@@ -56,6 +56,24 @@ before(async () => {
               const match = url.pathname.match(/^\/api\/public\/venues\/([a-z0-9-]+)(.*)$/);
               assert.ok(match, `no private API may reach the upstream: ${url.pathname}`);
               const [, slug, suffix] = match;
+              if (
+                slug === "royalpalace" &&
+                suffix === "/halls/6ad7b95579088a82b30a04da/quote" &&
+                request.method === "POST" &&
+                body === "{}"
+              ) {
+                return json(
+                  {
+                    success: false,
+                    message: "Check the highlighted fields",
+                    errors: ["startAt", "endAt", "model"].map((path) => ({
+                      path,
+                      message: "Required",
+                    })),
+                  },
+                  400,
+                );
+              }
               if (slug === "hidden-hall")
                 return json({ success: false, message: "Not found" }, 404);
               if (slug === "backend-down") return json({ success: false }, 503);
@@ -166,6 +184,42 @@ test("workerd preserves the existing availability query and all three public JSO
     assert.deepEqual(await response.json(), { method: "POST", suffix, query: "", body });
     assert.equal(calls.at(-1).headers.get("cookie"), null);
     assert.equal(calls.at(-1).headers.get("authorization"), null);
+  }
+});
+
+test("bundled royalpalace quote POST preserves backend missing-field validation instead of edge 405", async () => {
+  const quotePath =
+    "/api/public/venues/royalpalace/halls/6ad7b95579088a82b30a04da/quote";
+  for (const query of ["", "?trace=quote%2Bvalidation&source=public"]) {
+    const beforeCount = calls.length;
+    const response = await fetchTenant(
+      `${quotePath}${query}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: "venueSession=private",
+          Authorization: "Bearer private",
+        },
+        body: "{}",
+      },
+      "royalpalace",
+    );
+    assert.equal(response.status, 400, "the bundled Worker must allow quote POSTs");
+    assert.equal(response.headers.get("content-type"), "application/json; charset=utf-8");
+    const validation = await response.json();
+    assert.equal(validation.success, false);
+    assert.deepEqual(validation.errors.map(({ path }) => path), ["startAt", "endAt", "model"]);
+    assert.equal(calls.length, beforeCount + 1, "no Netlify or tenant-metadata fetch is allowed");
+    const upstream = calls.at(-1);
+    assert.equal(upstream.url.origin, BACKEND);
+    assert.equal(upstream.url.pathname, quotePath);
+    assert.equal(upstream.url.search, query);
+    assert.equal(upstream.method, "POST");
+    assert.equal(upstream.body, "{}");
+    assert.equal(upstream.headers.get("content-type"), "application/json");
+    assert.equal(upstream.headers.get("cookie"), null);
+    assert.equal(upstream.headers.get("authorization"), null);
   }
 });
 

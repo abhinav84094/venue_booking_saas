@@ -4,6 +4,12 @@ The production customer-host Worker is versioned here. It imports the shared
 slug and SEO modules from the repository root. Deploy the bundled module, not
 the unbundled source pasted into the dashboard.
 
+For the reproduced Royal Palace **POST quote 405**, see the
+[incident diagnosis and exact manual version/route checks](./QUOTE_405_INCIDENT.md).
+The repository already allows quote POSTs; a matching legacy production handler
+must be replaced through the existing Worker's active version/route. Use
+`npm run smoke:production:quote` for the explicit, non-mutating validation probe.
+
 Use Node.js 22 or newer:
 
 ```powershell
