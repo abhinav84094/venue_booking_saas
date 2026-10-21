@@ -16,7 +16,7 @@ test("public HTML supplies saved appearance before the blocking bootstrap withou
   );
   assert.equal((html.match(/name="description"/g) || []).length, 1);
   assert.match(html, /A &amp; B \| Prakash SaaS/);
-  assert.match(html, /name="description" content="Custom story"/);
+  assert.match(html, /name="description" content="A &amp; B\. Custom story"/);
 });
 
 test("invalid or old website appearance safely follows the device", () => {

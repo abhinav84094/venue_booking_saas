@@ -27,6 +27,7 @@ export function HallsSection({ halls, actions }) {
                   src={h.images?.[0].url}
                   alt={h.images?.[0].alt || h.name}
                   loading="lazy"
+                  sizes="(max-width: 760px) 88vw, 45vw"
                 />
               ) : (
                 <div className="public-hall-art">

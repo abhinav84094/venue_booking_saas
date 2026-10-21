@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import authRoutes from "./routes/authRoutes.js";
 import { venueRoutes, adminRoutes } from "./routes/venueRoutes.js";
 import publicRoutes from "./routes/publicVenueRoutes.js";
+import seoRoutes from "./routes/seoRoutes.js";
 import { handleSubscriptionWebhook } from "./controllers/subscriptionWebhookController.js";
 import { configureProxyTrust, apiLimiters } from "./middleware/rateLimitMiddleware.js";
 import { corsForRequest, csrfGuard, securityHeaders } from "./middleware/securityMiddleware.js";
@@ -31,6 +32,7 @@ export function createApp() {
   app.use("/api/auth", authRoutes);
   app.use("/api/venues", venueRoutes);
   app.use("/api/public/venues", publicRoutes);
+  app.use("/api/public/seo", seoRoutes);
   app.use("/api/admin", adminRoutes);
   return app;
 }

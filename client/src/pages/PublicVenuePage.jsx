@@ -25,7 +25,7 @@ export default function PublicVenuePage() {
   const settings = websiteSettings(venue?.website);
   const { config } = getVenueTemplate(settings.template);
   const appearance = useWebsiteAppearance(settings.appearance, config.supportsDarkMode);
-  useVenueMetadata(venue);
+  useVenueMetadata(venue, { error: resource.error });
   useEffect(() => {
     if (venue) setPublicAppearanceHint(appearance);
   }, [venue, appearance]);

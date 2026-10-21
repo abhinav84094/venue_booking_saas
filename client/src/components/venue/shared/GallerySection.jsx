@@ -26,6 +26,7 @@ export function GallerySection({ venue, halls, actions }) {
                 src={img.url}
                 alt={img.alt || `${venue.name} gallery ${i + 1}`}
                 loading="lazy"
+                sizes="(max-width: 760px) 44vw, 28vw"
               />
             </button>
           ))}

@@ -10,6 +10,9 @@ test("platform crawler files are real text/XML with canonical public URLs and pr
   ]);
   assert.match(robots, /^User-agent: \*/);
   assert.match(robots, /Disallow: \/api\//);
+  // Private HTML is noindex; allow crawlers to read that directive. Access
+  // controls remain enforced by the API, never by robots.txt.
+  assert.doesNotMatch(robots, /Disallow: \/(?:login|venues|v\/)/);
   assert.match(robots, /Sitemap: https:\/\/prakashsaas\.world\/sitemap\.xml/);
   assert.match(sitemap, /^<\?xml version="1\.0" encoding="UTF-8"\?>/);
   assert.deepEqual(

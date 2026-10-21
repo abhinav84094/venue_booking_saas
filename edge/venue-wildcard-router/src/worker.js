@@ -9,6 +9,10 @@ const MAX_DOCUMENT_BYTES = 2 * 1024 * 1024;
 const READ_METHODS = ["GET", "HEAD"];
 const STATIC_PATH =
   /^\/assets\/[a-zA-Z0-9][a-zA-Z0-9._-]*\.(?:js|css|woff2?|png|jpe?g|webp|avif|svg)$/;
+// Vite's content hash makes these generic files immutable across releases.
+// Unhashed files, failed responses and all tenant/private data stay uncached.
+const HASHED_ASSET =
+  /^\/assets\/[a-zA-Z0-9][a-zA-Z0-9._-]*-[a-zA-Z0-9_-]{8,}\.(?:js|css|woff2?|png|jpe?g|webp|avif|svg)$/;
 const STATIC_FILES = new Set(["/favicon.svg", "/theme-init.js"]);
 
 function failure(message, status = 502) {
@@ -95,10 +99,13 @@ function forwardedHeaders(request, { json = false, document = false } = {}) {
   }
   return headers;
 }
-function proxyResponse(upstream, incoming, target, method) {
+function proxyResponse(upstream, incoming, target, method, immutable = false) {
   const headers = new Headers(upstream.headers);
   headers.delete("set-cookie");
-  headers.set("Cache-Control", "no-store");
+  headers.set(
+    "Cache-Control",
+    immutable && upstream.ok ? "public, max-age=31536000, immutable" : "no-store",
+  );
   headers.set("X-Content-Type-Options", "nosniff");
   headers.set("X-Frame-Options", "DENY");
   if (headers.has("location")) {
@@ -118,7 +125,7 @@ function proxyResponse(upstream, incoming, target, method) {
 // The injection seam is only for local tests; production destinations are fixed
 // and never selected by user input, query parameters or request headers.
 export function createWorker({ fetch: fetchUpstream = globalThis.fetch, timeoutMs = 10000 } = {}) {
-  async function upstream(url, init, consume = (response) => response) {
+  async function upstream(url, init, consume = (response) => response, immutable = false) {
     const controller = new AbortController();
     let timer;
     try {
@@ -128,7 +135,9 @@ export function createWorker({ fetch: fetchUpstream = globalThis.fetch, timeoutM
             fetchUpstream(url, {
               ...init,
               redirect: "manual",
-              cache: "no-store",
+              // Only generic content-addressed assets may use upstream HTTP
+              // caching. Every tenant lookup and API request must remain live.
+              ...(immutable ? {} : { cache: "no-store" }),
               signal: controller.signal,
             }),
           )
@@ -224,16 +233,32 @@ export function createWorker({ fetch: fetchUpstream = globalThis.fetch, timeoutM
             Allow: READ_METHODS.join(", "),
           });
         if (asset) {
-          const response = await upstream(`${FRONTEND}${url.pathname}${url.search}`, {
-            method,
-            headers: forwardedHeaders(request),
-          });
+          const immutable = HASHED_ASSET.test(url.pathname);
+          const response = await upstream(
+            `${FRONTEND}${url.pathname}${url.search}`,
+            { method, headers: forwardedHeaders(request) },
+            undefined,
+            immutable,
+          );
           if (response.ok && response.headers.get("content-type")?.includes("text/html"))
             throw failure("Invalid static asset response");
-          return proxyResponse(response, url, `${FRONTEND}${url.pathname}${url.search}`, method);
+          return proxyResponse(
+            response,
+            url,
+            `${FRONTEND}${url.pathname}${url.search}`,
+            method,
+            immutable,
+          );
         }
         const { venue, halls } = await publicVenue(slug);
         const canonical = `https://${slug}.${BASE_DOMAIN}/`;
+        // Check publication before redirecting: hidden/unknown venues must
+        // remain actual 404s on HTTP as well as HTTPS, and outages remain 5xx.
+        if (url.protocol !== "https:") {
+          const headers = responseHeaders("text/plain; charset=utf-8");
+          headers.set("Location", `${canonical.slice(0, -1)}${url.pathname}${url.search}`);
+          return new Response(null, { status: 308, headers });
+        }
         if (robots || sitemap) {
           const body = robots
             ? `User-agent: *\nAllow: /$\nDisallow: /api/\nSitemap: ${canonical}sitemap.xml\n`

@@ -52,7 +52,7 @@ test("responsive welcome and auth pages render with no overflow or critical acce
   expect(
     await page.locator("html").evaluate((node) => parseFloat(getComputedStyle(node).fontSize)),
   ).toBeGreaterThanOrEqual(16);
-  await expect(page.getByRole("heading", { name: /We make room/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Venue booking,/ })).toBeVisible();
   await noOverflow(page);
   await page.screenshot({ path: testInfo.outputPath("landing-desktop.png"), fullPage: true });
   const accessibility = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
@@ -208,6 +208,10 @@ test("verified hall payment unlocks management independently; public enquiry bec
   await expect(
     page.getByRole("heading", { name: "Grand Celebration Hall", exact: true }),
   ).toBeVisible();
+  // The heading exists on the previous card while its post-save GET refreshes.
+  // Reopen only after the saved rates have reached the visible card.
+  await expect(page.locator(".hall-card .hall-prices")).toContainText("\u20b94,700.00");
+  await expect(page.locator(".hall-card img")).toHaveAttribute("src", uploadedImageUrl);
   await page.getByRole("button", { name: "Manage hall", exact: true }).click();
   await expect(page.getByLabel("Price (₹)", { exact: true })).toHaveValue("4700");
   await expect(page.getByLabel("Price per hour (₹)")).toHaveValue("2500");
@@ -276,7 +280,7 @@ test("verified hall payment unlocks management independently; public enquiry bec
     "data-appearance",
     "dark",
   );
-  await expect(publicPage).toHaveTitle("Browser Test Venue | Prakash SaaS");
+  await expect(publicPage).toHaveTitle("Browser Test Venue | Banquet hall in Patna | Prakash SaaS");
   await expect(publicPage.locator("#facilities")).toHaveCount(0);
   await noOverflow(publicPage);
   await publicPage.screenshot({ path: testInfo.outputPath("public-desktop.png"), fullPage: true });

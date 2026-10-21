@@ -11,8 +11,10 @@ export function VenueHero({ venue, settings }) {
           className="public-cover"
           src={cover}
           alt={`${venue.name}, event venue`}
+          loading="eager"
           fetchPriority="high"
           width={1920}
+          sizes="100vw"
         />
       )}
       <div className="public-hero-overlay" />

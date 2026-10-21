@@ -300,7 +300,9 @@ test("SSR uses saved website headings and section visibility with Prakash SaaS m
   ]);
   assert.ok(html.includes('<meta name="application-name" content="Prakash SaaS">'));
   assert.ok(html.includes("<h1>Your custom headline</h1>"));
-  assert.ok(html.includes('content="Your custom description"'));
+  assert.ok(
+    html.includes('content="A Real Venue in Private section city. Your custom description"'),
+  );
   assert.equal(html.includes("<h2>About the venue</h2>"), false);
   assert.equal(html.includes("Hidden Hall Listing"), false);
   assert.equal(html.includes("<h2>Visit us</h2>"), false);

@@ -91,6 +91,10 @@ test("two customer hostnames resolve separate backend venues and initial HTML me
       new RegExp(`<meta[^>]+property=["']og:url["'][^>]+https://${slug}\\.prakashsaas\\.world/`),
     );
     assert.match(html, /<meta[^>]+property=["']og:image["']/);
+    assert.match(html, /<meta[^>]+name=["']twitter:card["'][^>]+summary_large_image/);
+    assert.match(html, /<meta[^>]+name=["']twitter:title["']/);
+    assert.match(html, /<meta[^>]+name=["']twitter:description["']/);
+    assert.match(html, /<meta[^>]+name=["']twitter:image["']/);
     const structured = html.match(
       /<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/,
     );
@@ -105,6 +109,111 @@ test("two customer hostnames resolve separate backend venues and initial HTML me
     app.calls.filter(({ url }) => url.origin === BACKEND).map(({ url }) => url.pathname),
     ["/api/public/venues/sunrise-hall", "/api/public/venues/moonlight-venue"],
   );
+});
+
+test("initial metadata has one accurate business graph and no stale social tags", async () => {
+  const shell = htmlShell.replace(
+    "</head>",
+    '<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Platform"><meta property="og:image" content="https://images.example.test/platform.jpg"><script type="application/ld+json">{"@type":"Organization","name":"Platform"}</script></head>',
+  );
+  const app = harness((request) =>
+    new URL(request.url).origin === BACKEND
+      ? json({
+          success: true,
+          venue: venue("sunrise-hall", {
+            type: "banquet",
+            openingHours: "Mo-Fr 09:00-18:00",
+            coverImage: "https://res.cloudinary.com/venue/image/upload/v123/cover.jpg",
+            website: { tagline: "Meet at Sunrise Hall in Pune.", sections: { contact: false } },
+          }),
+          halls: [],
+        })
+      : new Response(shell, { headers: { "Content-Type": "text/html" } }),
+  );
+  const response = await app.fetch();
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /<title>Sunrise Hall \| Banquet hall in Pune \| Prakash SaaS<\/title>/);
+  assert.equal((html.match(/name="twitter:card"/g) || []).length, 1);
+  assert.equal((html.match(/name="twitter:title"/g) || []).length, 1);
+  assert.equal((html.match(/property="og:image"/g) || []).length, 1);
+  assert.equal((html.match(/rel="canonical"/g) || []).length, 1);
+  assert.equal((html.match(/type="application\/ld\+json"/g) || []).length, 1);
+  assert.match(
+    html,
+    /rel="preload" as="image"[^>]+imagesrcset="[^">]+w_960,c_limit[^">]+" imagesizes="100vw"/,
+  );
+  const data = JSON.parse(html.match(/type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/)[1]);
+  assert.deepEqual(data["@type"], ["EventVenue", "LocalBusiness"]);
+  assert.equal(data.name, "Sunrise Hall");
+  assert.deepEqual(data.image, ["https://res.cloudinary.com/venue/image/upload/v123/cover.jpg"]);
+  for (const field of [
+    "telephone",
+    "address",
+    "openingHours",
+    "geo",
+    "aggregateRating",
+    "review",
+    "priceRange",
+    "offers",
+  ])
+    assert.equal(
+      data[field],
+      undefined,
+      `${field} must not disclose hidden or invented information`,
+    );
+});
+
+test("HTTP documents and crawler resources redirect only after publication is verified", async () => {
+  const app = harness(publishedHandler);
+  for (const path of ["/?campaign=public", "/robots.txt", "/sitemap.xml"]) {
+    for (const method of ["GET", "HEAD"]) {
+      const start = app.calls.length;
+      const response = await app.worker.fetch(
+        new Request(`http://sunrise-hall.prakashsaas.world${path}`, { method }),
+      );
+      assert.equal(response.status, 308);
+      assert.equal(
+        response.headers.get("location"),
+        `https://sunrise-hall.prakashsaas.world${path}`,
+      );
+      assert.equal(response.headers.get("cache-control"), "no-store");
+      assert.equal(await response.text(), "");
+      assert.equal(app.calls.length, start + 1);
+      assert.equal(app.calls.at(-1).url.origin, BACKEND);
+    }
+  }
+  for (const status of [404, 503]) {
+    const hidden = harness(() => json({ success: false }, status));
+    const response = await hidden.worker.fetch(
+      new Request("http://sunrise-hall.prakashsaas.world/"),
+    );
+    assert.equal(response.status, status);
+    assert.equal(response.headers.get("location"), null);
+    assert.match(response.headers.get("x-robots-tag"), /noindex/);
+  }
+});
+
+test("publication changes immediately remove and restore documents and crawler resources", async () => {
+  let published = true;
+  const app = harness((request) =>
+    new URL(request.url).origin === BACKEND && !published
+      ? json({ success: false, message: "Not published" }, 404)
+      : publishedHandler(request),
+  );
+  for (const allowed of [true, false, true]) {
+    published = allowed;
+    for (const path of ["/", "/robots.txt", "/sitemap.xml"]) {
+      const response = await app.fetch(path);
+      assert.equal(response.status, allowed ? 200 : 404);
+      assert.equal(response.headers.get("cache-control"), "no-store");
+      if (!allowed) {
+        assert.match(response.headers.get("x-robots-tag"), /noindex/);
+        assert.doesNotMatch(await response.text(), /rel="canonical"|<loc>/);
+      }
+    }
+  }
+  assert.ok(app.calls.every(({ init }) => init.cache === "no-store"));
 });
 
 test("metadata escapes HTML and JSON-LD script breakouts", async () => {
@@ -457,6 +566,44 @@ test("generic static assets are proxied without tenant/auth data or owner PWA re
   assert.equal(app.calls[0].request.headers.get("cookie"), null);
   assert.equal(app.calls[0].request.headers.get("authorization"), null);
   assert.equal(app.calls[0].url.search, "?v=2");
+});
+
+test("only successful content-hashed Vite assets receive immutable cache headers", async () => {
+  for (const [path, status, immutable] of [
+    ["/assets/index-BSCWAR-4.js", 200, true],
+    ["/assets/PublicVenuePage-Abc123_9.css?version=2", 200, true],
+    ["/assets/photo-Abc123_9.webp", 200, true],
+    ["/assets/index-Abc123_9.js", 404, false],
+    ["/assets/index-Abc123_9.js", 503, false],
+    ["/assets/index.js", 200, false],
+    ["/assets/index-abc123.js", 200, false],
+    ["/favicon.svg", 200, false],
+    ["/theme-init.js", 200, false],
+  ]) {
+    const app = harness(
+      () =>
+        new Response("generic static file", {
+          status,
+          headers: {
+            "Content-Type": "text/javascript",
+            "Cache-Control": "public, max-age=999999999",
+          },
+        }),
+    );
+    const response = await app.fetch(path);
+    assert.equal(response.status, status);
+    assert.equal(
+      response.headers.get("cache-control"),
+      immutable ? "public, max-age=31536000, immutable" : "no-store",
+      path,
+    );
+    assert.equal(app.calls.length, 1);
+    assert.equal(app.calls[0].url.origin, FRONTEND);
+    assert.equal(
+      app.calls[0].init.cache,
+      /-[a-zA-Z0-9_-]{8,}\./.test(path) ? undefined : "no-store",
+    );
+  }
 });
 
 test("Render connection failures return 502 without serving a successful generic SPA", async () => {

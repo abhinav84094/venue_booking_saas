@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { classifyTenantHost } from "../../shared/tenantHost.js";
+import { classifyTenantHost, isPlatformPreviewHost } from "../../shared/tenantHost.js";
 import { getVenueSlugFromHostname } from "../src/utils/venueDomain.js";
 
 test("two production tenant hostnames resolve to their own shared-policy slugs", () => {
@@ -23,6 +23,8 @@ test("only approved platform and development hosts resolve to the owner applicat
     "localhost",
     "127.0.0.1",
     "[::1]",
+    "deploy-preview-10--venue-booking-saas.netlify.app",
+    "seo-review--venue-booking-saas.netlify.app",
   ]) {
     assert.deepEqual(classifyTenantHost(hostname), { type: "platform", slug: null }, hostname);
     assert.equal(getVenueSlugFromHostname(hostname, "prakashsaas.world"), null);
@@ -43,7 +45,7 @@ test("reserved, malformed, nested and unrelated hosts fail closed", () => {
     "prakashsaas.world.attacker.test",
     "amber-hall.prakashsaas.world.attacker.test",
     "amber-hall.venue-booking-saas.netlify.app",
-    "deploy-preview-10--venue-booking-saas.netlify.app",
+    "deploy-preview-10--another-site.netlify.app",
     "evil.test",
     "https://amber-hall.prakashsaas.world",
     "amber-hall.prakashsaas.world/login",
@@ -52,6 +54,14 @@ test("reserved, malformed, nested and unrelated hosts fail closed", () => {
     undefined,
   ])
     assert.deepEqual(classifyTenantHost(hostname), { type: "invalid", slug: null }, hostname);
+});
+
+test("preview classification is restricted to the actual Netlify site", () => {
+  assert.equal(isPlatformPreviewHost("deploy-preview-10--venue-booking-saas.netlify.app"), true);
+  assert.equal(isPlatformPreviewHost("main--venue-booking-saas.netlify.app"), true);
+  assert.equal(isPlatformPreviewHost("venue-booking-saas.netlify.app"), false);
+  assert.equal(isPlatformPreviewHost("evil.test--venue-booking-saas.netlify.app"), false);
+  assert.equal(isPlatformPreviewHost("deploy-preview-10--venue-booking-saas.netlify.app.attacker.test"), false);
 });
 
 test("a configured tenant base does not make unrelated hostnames platform hosts", () => {

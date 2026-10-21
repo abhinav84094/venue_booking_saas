@@ -7,6 +7,15 @@ export const PLATFORM_HOSTNAMES = Object.freeze([
 ]);
 const LOCAL_HOSTNAMES = new Set(["localhost", "127.0.0.1", "[::1]"]);
 
+// Only previews belonging to this Netlify site can render the platform UI.
+// This is not authentication authority: API CORS and membership checks remain
+// independent, and previews must never become canonical or install the PWA.
+export function isPlatformPreviewHost(hostname) {
+  return /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?--venue-booking-saas\.netlify\.app$/.test(
+    normalizeHostname(hostname),
+  );
+}
+
 // Hostnames are identities, not arbitrary URLs. Reject ports, paths, credentials
 // and nested tenant names rather than falling back to the owner application.
 export function normalizeHostname(value) {
@@ -27,7 +36,7 @@ export function classifyTenantHost(
   const host = normalizeHostname(hostname);
   const base = normalizeHostname(baseDomain);
   if (!host || !base) return { type: "invalid", slug: null };
-  if (host === base || LOCAL_HOSTNAMES.has(host) || platformHosts.includes(host))
+  if (host === base || LOCAL_HOSTNAMES.has(host) || platformHosts.includes(host) || isPlatformPreviewHost(host))
     return { type: "platform", slug: null };
   if (!host.endsWith(`.${base}`)) return { type: "invalid", slug: null };
   const slug = host.slice(0, -base.length - 1);

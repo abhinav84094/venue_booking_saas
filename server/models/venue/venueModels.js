@@ -50,6 +50,8 @@ const venue = new Schema(
   options,
 );
 venue.index({ ownerId: 1, createdAt: -1 });
+// Public discovery reads only eligible slugs, ordered for bounded sitemap pages.
+venue.index({ published: 1, suspended: 1, slug: 1 });
 const membership = new Schema(
   {
     venueId: ref("Venue", { immutable: true }),

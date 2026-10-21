@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { VitePWA } from "vite-plugin-pwa";
 import { venueTemplateMetadata } from "./build/venueTemplateMetadata.js";
+import { platformSeo } from "./build/platformSeo.js";
 
 export default defineConfig(({ mode }) => ({
   define:
@@ -17,6 +18,7 @@ export default defineConfig(({ mode }) => ({
         }
       : {},
   plugins: [
+    platformSeo(),
     venueTemplateMetadata(),
     react(),
     tailwindcss(),

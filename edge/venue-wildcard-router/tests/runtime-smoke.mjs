@@ -47,6 +47,11 @@ before(async () => {
               if (url.origin === FRONTEND && url.pathname === "/") {
                 return new Response(shell, { headers: { "Content-Type": "text/html" } });
               }
+              if (url.origin === FRONTEND && url.pathname.startsWith("/assets/")) {
+                return new Response("/* public asset */", {
+                  headers: { "Content-Type": "text/javascript" },
+                });
+              }
               assert.equal(url.origin, BACKEND, "all destinations are fixed production origins");
               const match = url.pathname.match(/^\/api\/public\/venues\/([a-z0-9-]+)(.*)$/);
               assert.ok(match, `no private API may reach the upstream: ${url.pathname}`);
@@ -99,7 +104,9 @@ test("workerd renders separate tenants with initial SEO and a matching JSON-LD C
     const response = await fetchTenant("/", {}, slug);
     assert.equal(response.status, 200);
     const html = await response.text();
-    assert.ok(html.includes(`<title>${name} | Prakash SaaS</title>`));
+    assert.ok(html.includes(`<title>${name} | Event venue in Pune | Prakash SaaS</title>`));
+    assert.match(html, /<meta name="twitter:card" content="summary">/);
+    assert.match(html, /<meta name="twitter:title"/);
     assert.ok(html.includes(`<link rel="canonical" href="https://${slug}.prakashsaas.world/">`));
     assert.ok(
       html.includes(`<meta property="og:url" content="https://${slug}.prakashsaas.world/">`),
@@ -186,5 +193,26 @@ test("workerd keeps Render outage status and returns no successful SPA fallback"
     const response = await fetchTenant(path, {}, "backend-down");
     assert.equal(response.status, 503);
     assert.doesNotMatch(await response.text(), /<div id="root">/);
+  }
+});
+
+test("workerd redirects verified public HTTP documents and caches only hashed static assets", async () => {
+  const redirect = await runtime.dispatchFetch("http://sunrise-hall.prakashsaas.world/", {
+    redirect: "manual",
+  });
+  assert.equal(redirect.status, 308);
+  assert.equal(redirect.headers.get("location"), "https://sunrise-hall.prakashsaas.world/");
+  const hidden = await runtime.dispatchFetch("http://hidden-hall.prakashsaas.world/", {
+    redirect: "manual",
+  });
+  assert.equal(hidden.status, 404);
+  assert.equal(hidden.headers.get("location"), null);
+  for (const [path, cache] of [
+    ["/assets/index-Abc123_9.js", "public, max-age=31536000, immutable"],
+    ["/assets/index.js", "no-store"],
+  ]) {
+    const response = await fetchTenant(path);
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("cache-control"), cache);
   }
 });

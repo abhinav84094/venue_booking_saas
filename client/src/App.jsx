@@ -6,7 +6,8 @@ import { Loading, Notice } from "./components/ui";
 import { getVenueHost } from "./utils/venueDomain";
 import RouteAppearance from "./theme/RouteAppearance";
 import OwnerPwaBoundary from "./components/pwa/OwnerPwaBoundary";
-const Landing = lazy(() => import("./pages/LandingPage"));
+import RouteSeo from "./components/RouteSeo";
+import Landing from "./pages/LandingPage";
 const Auth = lazy(() => import("./pages/AuthPage"));
 const Venues = lazy(() => import("./pages/VenuesPage"));
 const Profile = lazy(() => import("./pages/VenueProfilePage"));
@@ -51,6 +52,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <RouteAppearance />
+      <RouteSeo />
       <OwnerPwaBoundary>
         <Suspense fallback={<Loading />}>
           {host.type === "invalid" ? (

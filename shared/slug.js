@@ -1,4 +1,4 @@
-const RESERVED_SLUGS = new Set([
+export const RESERVED_VENUE_SLUGS = Object.freeze([
   "admin",
   "api",
   "app",
@@ -23,6 +23,7 @@ const RESERVED_SLUGS = new Set([
   "support",
   "www",
 ]);
+const RESERVED_SLUGS = new Set(RESERVED_VENUE_SLUGS);
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 

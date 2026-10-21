@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Brand } from "../components/ui";
 import { useAuth } from "../context/authContext";
+import { platformCopy } from "../../../shared/platformSeo.js";
 export default function LandingPage() {
   const { isAuthenticated } = useAuth();
   return (
@@ -29,22 +30,19 @@ export default function LandingPage() {
         </Link>
       </header>
       <main>
-        <section className="landing-hero">
+        <section className="landing-hero" aria-labelledby="platform-heading">
           <div className="hero-copy">
             <div className="hero-kicker">
               <span />A BETTER HOME FOR YOUR VENUE
             </div>
-            <h1>
-              You create
+            <h1 id="platform-heading">
+              {platformCopy.heroLines[0]}
               <br />
-              the moments.
+              {platformCopy.heroLines[1]}
               <br />
-              <i>We make room.</i>
+              <i>{platformCopy.heroLines[2]}</i>
             </h1>
-            <p>
-              A beautiful website. An organized calendar. A calmer way to run your venue business —
-              all in one thoughtful workspace.
-            </p>
+            <p>{platformCopy.introduction}</p>
             <div className="hero-actions">
               <Link className="btn btn-primary btn-large" to="/register">
                 Bring your venue online <ArrowUpRight size={19} />
@@ -105,58 +103,43 @@ export default function LandingPage() {
             Conference spaces
           </p>
         </div>
-        <section className="experience-section" id="experience">
+        <section
+          className="experience-section"
+          id="experience"
+          aria-labelledby="experience-heading"
+        >
           <div className="section-heading">
             <p className="eyebrow">FROM FIRST IMPRESSION TO FINAL CELEBRATION</p>
-            <h2>
+            <h2 id="experience-heading">
               One beautiful place.
               <br />
               <i>For everything behind the event.</i>
             </h2>
           </div>
           <div className="feature-grid">
-            {[
-              {
-                n: "01",
-                icon: Globe2,
-                title: "A website with presence.",
-                text: "Give your venue its own address, showcase your halls, share your story and let customers find their perfect setting.",
-                foot: "Your space, your identity",
-              },
-              {
-                n: "02",
-                icon: Building2,
-                title: "Every hall, considered.",
-                text: "Set capacity, amenities and pricing for each space. Choose hourly, half-day, full-day or your own packages.",
-                foot: "Flexible by design",
-              },
-              {
-                n: "03",
-                icon: CalendarDays,
-                title: "A calendar with clarity.",
-                text: "Review enquiries, confirm events and block maintenance. Conflicting confirmations are prevented at the source.",
-                foot: "Room for confidence",
-              },
-            ].map(({ n, icon: Icon, title, text, foot }) => (
-              <article className="feature-card" key={n}>
-                <div>
-                  <Icon size={25} />
-                  <span>{n}</span>
-                </div>
-                <h3>{title}</h3>
-                <p>{text}</p>
-                <span className="feature-foot">
-                  {foot}
-                  <ArrowUpRight size={17} />
-                </span>
-              </article>
-            ))}
+            {platformCopy.features.map(({ n, title, text, foot }, index) => {
+              const Icon = [Globe2, Building2, CalendarDays][index];
+              return (
+                <article className="feature-card" key={n}>
+                  <div>
+                    <Icon size={25} />
+                    <span>{n}</span>
+                  </div>
+                  <h3>{title}</h3>
+                  <p>{text}</p>
+                  <span className="feature-foot">
+                    {foot}
+                    <ArrowUpRight size={17} />
+                  </span>
+                </article>
+              );
+            })}
           </div>
         </section>
-        <section className="workspace-section" id="workspace">
+        <section className="workspace-section" id="workspace" aria-labelledby="workspace-heading">
           <div>
             <p className="eyebrow">THE QUIET SIDE OF GREAT EVENTS</p>
-            <h2>
+            <h2 id="workspace-heading">
               More celebration.
               <br />
               <i>Less administration.</i>
@@ -170,13 +153,7 @@ export default function LandingPage() {
             </Link>
           </div>
           <div className="workspace-list">
-            {[
-              "Independent websites for every venue",
-              "Hall-wise availability and pricing",
-              "Customer enquiries without registration",
-              "Scoped access for your team",
-              "Separate venue and subscription payments",
-            ].map((t, i) => (
+            {platformCopy.workspace.map((t, i) => (
               <div key={t}>
                 <span>0{i + 1}</span>
                 <h3>{t}</h3>
@@ -185,9 +162,9 @@ export default function LandingPage() {
             ))}
           </div>
         </section>
-        <section className="landing-cta">
+        <section className="landing-cta" aria-labelledby="start-heading">
           <p className="eyebrow">YOUR NEXT CHAPTER STARTS HERE</p>
-          <h2>
+          <h2 id="start-heading">
             Great moments
             <br />
             need <i>great spaces.</i>

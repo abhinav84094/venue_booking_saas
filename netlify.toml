@@ -1,0 +1,13 @@
+# Keep existing DNS, TLS, domains and Cloudflare Worker routes unchanged.
+[build]
+  # The Edge bundler's module root must include shared/**. Using client as
+  # base builds Vite successfully but excludes shared modules from eszip.
+  base = "."
+  command = "npm --prefix client ci && npm --prefix client run build"
+  publish = "client/dist"
+  edge_functions = "client/netlify/edge-functions"
+
+[[edge_functions]]
+  function = "platform-seo"
+  path = "/*"
+  excludedPath = ["/api/*", "/assets/*", "/pwa-icons/*", "/sw.js", "/manifest.webmanifest", "/favicon.svg", "/theme-init.js", "/offline.html", "/offline.css", "/offline.js"]

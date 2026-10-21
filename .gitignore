@@ -15,6 +15,9 @@ backend/.env
 # Build output
 dist/
 build/
+!client/build/
+!client/build/*.js
+.netlify/
 
 # Logs
 *.log
