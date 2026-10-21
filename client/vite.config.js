@@ -12,7 +12,7 @@ export default defineConfig(({ mode }) => ({
           "import.meta.env.VITE_VENUE_GOOGLE_CLIENT_ID": JSON.stringify(
             "disposable-browser-google-client",
           ),
-          "import.meta.env.VITE_PUBLIC_VENUE_DOMAIN": JSON.stringify(""),
+          "import.meta.env.VITE_PUBLIC_VENUE_DOMAIN": JSON.stringify("prakashsaas.world"),
           "import.meta.env.VITE_VENUE_PLATFORM_URL": JSON.stringify(""),
         }
       : {},

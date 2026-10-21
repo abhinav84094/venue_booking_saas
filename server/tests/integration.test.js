@@ -279,6 +279,68 @@ test("public slug routes expose published fields and halls without private owner
   await Venue.updateOne({ _id: venue._id }, { $set: { published: false } });
   assert.equal((await request("GET", `/public/venues/${venue.slug}`, undefined, null)).status, 404);
 });
+test("public hall endpoints return 404 before billing for missing, foreign or hidden halls without writes", async () => {
+  const { venue } = await fixture();
+  const foreignVenue = await Venue.create({
+    ownerId: other._id,
+    name: "Another Tenant",
+    slug: `foreign-public-${++sequence}`,
+    timezone: "Asia/Kolkata",
+    published: true,
+  });
+  const [foreign, inactive, unpublished, unpaid] = await Hall.create([
+    {
+      venueId: foreignVenue._id,
+      name: "Foreign Hall",
+      capacity: 500,
+      active: true,
+      published: true,
+    },
+    { venueId: venue._id, name: "Inactive Hall", capacity: 500, active: false, published: true },
+    { venueId: venue._id, name: "Draft Hall", capacity: 500, active: true, published: false },
+    { venueId: venue._id, name: "Unpaid Hall", capacity: 500, active: true, published: true },
+  ]);
+  const bookingCount = await Booking.countDocuments();
+  const customerCount = await Customer.countDocuments();
+  const range = { startAt: "2035-01-10T10:00", endAt: "2035-01-10T14:00" };
+  const prefix = `/public/venues/${venue.slug}`;
+  for (const id of [new mongoose.Types.ObjectId(), foreign._id, inactive._id, unpublished._id]) {
+    const hallId = String(id);
+    const paths = [
+      ["GET", `${prefix}/halls/${hallId}/availability?${new URLSearchParams(range)}`, undefined],
+      ["POST", `${prefix}/halls/${hallId}/quote`, { ...range, model: "HOURLY" }],
+      ["POST", `${prefix}/enquiries`, enquiry({ _id: hallId })],
+    ];
+    for (const [method, path, body] of paths) {
+      const result = await request(method, path, body, null);
+      assert.equal(result.status, 404, `${method} ${path}: ${JSON.stringify(result.data)}`);
+      assert.equal(result.data.message, "Hall not found");
+    }
+  }
+  for (const [method, suffix, body] of [
+    ["GET", `availability?${new URLSearchParams(range)}`, undefined],
+    ["POST", "quote", { ...range, model: "HOURLY" }],
+  ]) {
+    assert.equal(
+      (await request(method, `${prefix}/halls/not-an-id/${suffix}`, body, null)).status,
+      404,
+    );
+  }
+  assert.equal(
+    (
+      await request(
+        "GET",
+        `${prefix}/halls/${unpaid._id}/availability?${new URLSearchParams(range)}`,
+        undefined,
+        null,
+      )
+    ).status,
+    402,
+    "Visible halls still require verified payment and an active subscription",
+  );
+  assert.equal(await Booking.countDocuments(), bookingCount);
+  assert.equal(await Customer.countDocuments(), customerCount);
+});
 test("website edits preserve contact/address, and hall edits preserve saved pricing/publication", async () => {
   const { venue, hall } = await fixture();
   assert.equal(

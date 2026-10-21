@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/authContext";
 import ProtectedRoute from "./components/shared/ProtectedRoute";
 import { Loading, Notice } from "./components/ui";
-import { getVenueSlugFromHostname } from "./utils/venueDomain";
+import { getVenueHost } from "./utils/venueDomain";
 import RouteAppearance from "./theme/RouteAppearance";
 import OwnerPwaBoundary from "./components/pwa/OwnerPwaBoundary";
 const Landing = lazy(() => import("./pages/LandingPage"));
@@ -35,16 +35,30 @@ function Guest({ children }) {
     children
   );
 }
+function NotFound() {
+  return (
+    <main className="standalone">
+      <p className="eyebrow">A LITTLE OFF THE MAP</p>
+      <h1>This space is still waiting to be found.</h1>
+      <a className="btn btn-primary" href="/">
+        Return home
+      </a>
+    </main>
+  );
+}
 export default function App() {
-  const subdomain = getVenueSlugFromHostname();
+  const host = getVenueHost();
   return (
     <BrowserRouter>
       <RouteAppearance />
       <OwnerPwaBoundary>
         <Suspense fallback={<Loading />}>
-          {subdomain ? (
+          {host.type === "invalid" ? (
+            <NotFound />
+          ) : host.type === "tenant" ? (
             <Routes>
-              <Route path="*" element={<PublicVenue />} />
+              <Route path="/" element={<PublicVenue />} />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           ) : (
             <Routes>
@@ -106,18 +120,7 @@ export default function App() {
                 </Route>
                 <Route path="/admin" element={<Admin />} />
               </Route>
-              <Route
-                path="*"
-                element={
-                  <main className="standalone">
-                    <p className="eyebrow">A LITTLE OFF THE MAP</p>
-                    <h1>This space is still waiting to be found.</h1>
-                    <a className="btn btn-primary" href="/">
-                      Return home
-                    </a>
-                  </main>
-                }
-              />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           )}
         </Suspense>

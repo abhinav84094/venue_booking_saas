@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /google/
+Disallow: /venues
+Disallow: /account
+Disallow: /admin
+Disallow: /v/
+Sitemap: https://prakashsaas.world/sitemap.xml

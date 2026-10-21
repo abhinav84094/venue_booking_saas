@@ -284,20 +284,23 @@ test("public venue navigation has no owner manifest, installation action or serv
   ).toBe(0);
 });
 
-test("unrelated customer origins do not opt into the owner PWA even when serving the same frontend", async ({
+test("customer origins cannot expose owner login or opt into the owner PWA", async ({
   browser,
   baseURL,
 }) => {
   const context = await browser.newContext();
   try {
-    await context.route("https://grandhall.venue.prakashsaas.com/**", async (route) => {
+    await context.route("https://grandhall.prakashsaas.world/**", async (route) => {
       const url = new URL(route.request().url());
       const response = await route.fetch({ url: `${baseURL}${url.pathname}${url.search}` });
       await route.fulfill({ response });
     });
     const page = await context.newPage();
-    await page.goto("https://grandhall.venue.prakashsaas.com/login");
-    await expect(page.getByRole("heading", { name: "Welcome back." })).toBeVisible();
+    await page.goto("https://grandhall.prakashsaas.world/login");
+    await expect(
+      page.getByRole("heading", { name: "This space is still waiting to be found." }),
+    ).toBeVisible();
+    await expect(page.getByLabel("Email address")).toHaveCount(0);
     await expect(page.locator('link[rel="manifest"]')).toHaveCount(0);
     await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveCount(0);
     expect(

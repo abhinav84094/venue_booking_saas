@@ -1,0 +1,10 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "venue-wildcard-router",
+  "main": "src/index.js",
+  "compatibility_date": "2026-10-21",
+  "keep_vars": true,
+  // Routing, custom domains, workers.dev and DNS/SSL remain dashboard-managed.
+  // Do not use `wrangler deploy` for production: upload a version and promote
+  // it with the versions API as documented in README.md, preserving triggers.
+}

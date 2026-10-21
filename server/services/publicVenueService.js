@@ -18,6 +18,12 @@ export async function resolvePublicVenue(slug) {
   must(venue, "Venue not found or not published", 404);
   return venue;
 }
+export async function resolvePublicHall(venueId, hallId) {
+  must(typeof hallId === "string" && /^[a-f\d]{24}$/i.test(hallId), "Hall not found", 404);
+  const hall = await Hall.findOne({ _id: hallId, venueId, active: true, published: true });
+  must(hall, "Hall not found", 404);
+  return hall;
+}
 export async function getPublicVenue(slug) {
   const venue = await resolvePublicVenue(slug);
   // Preserve published venue information after expiry. A never-paid

@@ -13,6 +13,14 @@
   Content-Type: application/manifest+json; charset=utf-8
   Cache-Control: no-cache, must-revalidate
 
+/robots.txt
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: no-cache, must-revalidate
+
+/sitemap.xml
+  Content-Type: application/xml; charset=utf-8
+  Cache-Control: no-cache, must-revalidate
+
 /offline.html
   Content-Type: text/html; charset=utf-8
   Cache-Control: no-cache, must-revalidate

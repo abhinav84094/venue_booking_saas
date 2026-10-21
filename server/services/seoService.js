@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import express from "express";
 import { randomBytes } from "node:crypto";
+import { normalizeHostname } from "../../shared/tenantHost.js";
 import { getPublicVenue, slugFromHost } from "./publicVenueService.js";
 import { renderVenueHtml } from "./venueMetadataService.js";
 export { renderVenueHtml, venueStructuredData } from "./venueMetadataService.js";
@@ -31,7 +32,9 @@ export async function attachClient(app) {
         slug = slugFromHost(req.hostname) || pathSlug;
       if (slug) {
         const { venue, halls } = await getPublicVenue(slug);
-        html = renderVenueHtml(index, venue, halls, nonce);
+        const canonicalBase = normalizeHostname(process.env.PUBLIC_VENUE_DOMAIN);
+        const canonicalUrl = canonicalBase ? `https://${venue.slug}.${canonicalBase}/` : "";
+        html = renderVenueHtml(index, venue, halls, nonce, canonicalUrl);
       }
       res.set(
         "Content-Security-Policy",

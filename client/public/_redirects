@@ -13,6 +13,8 @@
 /offline.js               /static-not-found.txt  404
 /theme-init.js            /static-not-found.txt  404
 /favicon.svg              /static-not-found.txt  404
+/robots.txt               /static-not-found.txt  404
+/sitemap.xml              /static-not-found.txt  404
 
 # Preserve owner and public venue React Router deep links.
 /*    /index.html   200

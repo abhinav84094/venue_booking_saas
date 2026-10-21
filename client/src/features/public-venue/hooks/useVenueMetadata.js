@@ -1,55 +1,47 @@
 import { useEffect } from "react";
+import { venueMetadata, venueStructuredData } from "../../../../../shared/venueMetadata.js";
+import { getVenuePublicUrl } from "../../../utils/venueDomain.js";
+
+const METADATA_SELECTOR =
+  'title, meta[name="description"], meta[name="application-name"], meta[property^="og:"], link[rel~="canonical"], script[id="venue-structured-data"]';
 
 export function useVenueMetadata(venue) {
   useEffect(() => {
     if (!venue) return;
-    const oldTitle = document.title;
-    document.title = `${venue.name} | Prakash SaaS`;
-    let meta = document.querySelector('meta[name="description"]');
-    const previous = meta?.content,
-      created = !meta;
-    if (!meta) {
-      meta = document.createElement("meta");
-      meta.name = "description";
-      document.head.appendChild(meta);
+    const canonicalUrl = getVenuePublicUrl(venue.slug) || "";
+    const metadata = venueMetadata(venue, canonicalUrl);
+    // Replace the SSR tags as one set, including duplicates from older builds.
+    // Restore prior document metadata when leaving the public venue page.
+    const previous = [...document.head.querySelectorAll(METADATA_SELECTOR)];
+    previous.forEach((node) => node.remove());
+    const managed = [];
+    const append = (name, attributes, content) => {
+      const element = document.createElement(name);
+      for (const [key, value] of Object.entries(attributes)) element.setAttribute(key, value);
+      if (content !== undefined) element.textContent = content;
+      document.head.appendChild(element);
+      managed.push(element);
+    };
+    append("title", {}, metadata.title);
+    append("meta", { name: "application-name", content: "Prakash SaaS" });
+    append("meta", { name: "description", content: metadata.description });
+    if (metadata.canonicalUrl) {
+      append("link", { rel: "canonical", href: metadata.canonicalUrl });
+      append("meta", { property: "og:url", content: metadata.canonicalUrl });
     }
-    meta.content = (
-      venue.website?.tagline ||
-      venue.description ||
-      `Explore halls and enquire about your next event at ${venue.name}.`
-    ).slice(0, 160);
-    let script = document.getElementById("venue-structured-data");
-    const createdScript = !script,
-      previousStructure = script?.textContent;
-    if (!script) {
-      script = document.createElement("script");
-      script.id = "venue-structured-data";
-      document.head.appendChild(script);
-    }
-    script.type = "application/ld+json";
-    script.textContent = JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "EventVenue",
-      name: venue.name,
-      description: venue.description,
-      telephone: venue.contact?.phone || undefined,
-      image: venue.coverImage || undefined,
-      address: {
-        "@type": "PostalAddress",
-        streetAddress: venue.address?.line1,
-        addressLocality: venue.address?.city,
-        addressRegion: venue.address?.state,
-        postalCode: venue.address?.postalCode,
-        addressCountry: "IN",
-      },
-    });
+    append("meta", { property: "og:type", content: "website" });
+    append("meta", { property: "og:title", content: metadata.title });
+    append("meta", { property: "og:description", content: metadata.description });
+    if (metadata.image) append("meta", { property: "og:image", content: metadata.image });
+    append(
+      "script",
+      { id: "venue-structured-data", type: "application/ld+json" },
+      JSON.stringify(venueStructuredData(venue, metadata.canonicalUrl)),
+    );
 
     return () => {
-      document.title = oldTitle;
-      if (createdScript) script.remove();
-      else script.textContent = previousStructure;
-      if (created) meta.remove();
-      else meta.content = previous;
+      managed.forEach((node) => node.remove());
+      previous.forEach((node) => document.head.appendChild(node));
     };
   }, [venue]);
 }

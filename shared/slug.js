@@ -7,6 +7,7 @@ const RESERVED_SLUGS = new Set([
   "venues",
   "venue",
   "mail",
+  "cdn",
   "static",
   "assets",
   "staging",

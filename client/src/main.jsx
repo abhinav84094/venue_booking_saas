@@ -10,19 +10,21 @@ import ThemeToggle from "./components/ThemeToggle.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { initializeOwnerPwa } from "./pwa/runtime";
+import { getVenueHost } from "./utils/venueDomain";
 
 initializeOwnerPwa();
+const platformHost = getVenueHost().type === "platform";
 
 const Application = (
   <AuthProvider>
     <App />
-    <ThemeToggle />
+    {platformHost && <ThemeToggle />}
   </AuthProvider>
 );
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    {import.meta.env.VITE_VENUE_GOOGLE_CLIENT_ID ? (
+    {platformHost && import.meta.env.VITE_VENUE_GOOGLE_CLIENT_ID ? (
       <GoogleOAuthProvider clientId={import.meta.env.VITE_VENUE_GOOGLE_CLIENT_ID}>
         {Application}
       </GoogleOAuthProvider>

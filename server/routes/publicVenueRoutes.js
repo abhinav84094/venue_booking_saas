@@ -1,5 +1,5 @@
 import express from "express";
-import { Hall, Venue, Booking } from "../models/venueModels.js";
+import { Venue, Booking } from "../models/venueModels.js";
 import crypto from "node:crypto";
 import { z } from "zod";
 import { apiLimiters } from "../middleware/rateLimitMiddleware.js";
@@ -9,6 +9,7 @@ import { createEnquiry, getAvailability } from "../services/bookingService.js";
 import { requireFeature } from "../services/venueSubscriptionService.js";
 import {
   getPublicVenue,
+  resolvePublicHall,
   resolvePublicVenue,
   slugFromHost,
 } from "../services/publicVenueService.js";
@@ -68,10 +69,11 @@ router.get(
   apiLimiters.publicAvailability,
   async (req, res) => {
     const venue = await resolvePublicVenue(req.params.slug);
-    await requireFeature(venue._id, req.params.hallId, "enquiries");
+    const hall = await resolvePublicHall(venue._id, req.params.hallId);
+    await requireFeature(venue._id, hall._id, "enquiries");
     res.json({
       success: true,
-      ...(await getAvailability(venue, req.params.hallId, rangeSchema.parse(req.query), {
+      ...(await getAvailability(venue, hall._id, rangeSchema.parse(req.query), {
         isPublic: true,
       })),
     });
@@ -79,13 +81,7 @@ router.get(
 );
 router.post("/:slug/halls/:hallId/quote", apiLimiters.publicAvailability, async (req, res) => {
   const venue = await resolvePublicVenue(req.params.slug),
-    hall = await Hall.findOne({
-      _id: req.params.hallId,
-      venueId: venue._id,
-      active: true,
-      published: true,
-    });
-  must(hall, "Hall not found", 404);
+    hall = await resolvePublicHall(venue._id, req.params.hallId);
   await requireFeature(venue._id, hall._id, "publicWebsite");
   await requireFeature(venue._id, hall._id, "enquiries");
   res.json({
@@ -96,7 +92,8 @@ router.post("/:slug/halls/:hallId/quote", apiLimiters.publicAvailability, async 
 router.post("/:slug/enquiries", apiLimiters.enquiry, async (req, res) => {
   const venue = await resolvePublicVenue(req.params.slug);
   const input = enquirySchema.parse(req.body);
-  await requireFeature(venue._id, input.hallId, "enquiries");
+  const hall = await resolvePublicHall(venue._id, input.hallId);
+  await requireFeature(venue._id, hall._id, "enquiries");
   res.status(201).json({ success: true, enquiry: await createEnquiry(venue, input) });
 });
 export default router;

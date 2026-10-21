@@ -3,12 +3,15 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import api from "../services/api";
 
 import { AuthContext } from "./authContext.js";
+import { getVenueHost } from "../utils/venueDomain";
 
 export function AuthProvider({ children }) {
+  const platformHost = getVenueHost().type === "platform";
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(platformHost);
 
   const refreshUser = useCallback(async () => {
+    if (!platformHost) return null;
     try {
       const { data } = await api.get("/auth/me");
 
@@ -23,9 +26,12 @@ export function AuthProvider({ children }) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [platformHost]);
 
   useEffect(() => {
+    // Public tenant origins never discover or carry owner sessions. Their edge
+    // allowlist deliberately exposes public venue APIs only.
+    if (!platformHost) return;
     let active = true;
     api
       .get("/auth/me")
@@ -41,7 +47,7 @@ export function AuthProvider({ children }) {
     return () => {
       active = false;
     };
-  }, []);
+  }, [platformHost]);
 
   const setAuthenticatedUser = useCallback((authenticatedUser) => {
     if (!authenticatedUser?.id) {
